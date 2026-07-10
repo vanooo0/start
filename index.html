@@ -626,7 +626,7 @@ function applyTheme(code){
         'font-size:'+(22+Math.random()*32).toFixed(0)+'px;opacity:0;'+
         'animation:floatUp '+(9+Math.random()*9).toFixed(1)+'s linear '+(Math.random()*10).toFixed(1)+'s infinite';
       m.appendChild(s); } }
-  spawnCritters(t); hangFromHeadings(t);
+  document.querySelectorAll('.critter,.hanger').forEach(e=>e.remove());   // bespoke per-country layer to be rebuilt
 }
 function spawnCritters(t){
   document.querySelectorAll('.critter').forEach(e=>e.remove()); CRIT.length=0;
@@ -662,7 +662,7 @@ function confettiBurst(x,y){
     (function f(){ t++; vy+=0.42; s.style.transform='translate('+(vx*t).toFixed(0)+'px,'+((vy*t)+0.21*t*t).toFixed(0)+'px)';
       s.style.opacity=Math.max(0,1-t/48); if(t<48)requestAnimationFrame(f); else s.remove(); })(); }
 }
-document.addEventListener('click',e=>{ if(e.target.closest('button,a,input,.langopt,#langbtn,.critter,#gate'))return; confettiBurst(e.clientX,e.clientY); });
+// per-country interactive layer will be rebuilt bespoke (Eiffel falls, bear runs across, etc.)
 function applyLang(code){
   const d=I18N[code]||I18N.en;
   document.documentElement.lang=code;

@@ -680,9 +680,8 @@ document.querySelectorAll('.langopt').forEach(b=>b.onclick=()=>{
   window.scrollTo(0,0);                        // start every language swap from the top (hidden by the flag)
   const gate=document.getElementById('gate');
   const fin=()=>{ window.scrollTo(0,0); closeGate(); gate.style.opacity=''; gate.style.transition=''; };
-  if(matchMedia('(prefers-reduced-motion:reduce)').matches){window.scrollTo(0,0);closeGate();return;}
   gate.style.transition='opacity .4s ease'; gate.style.opacity='0';
-  flyFlag(iso,fin);
+  flyFlag(iso,fin);                            // always show the flag (even if the OS has "reduce motion" on)
 });
 document.getElementById('langbtn').onclick=openGate;
 (function(){

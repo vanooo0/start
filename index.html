@@ -210,6 +210,7 @@ h2{font-size:clamp(30px,5.5vw,48px);line-height:1.08;margin:0 0 20px;font-weight
   </div>
 </section>
 
+<script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r128/build/three.min.js"></script>
 <script>
 const I18N={
  en:{name:"English",badge:"MEXC · zero-fee pairs",h1a:"Your account",h1b:"works on its own",
@@ -589,47 +590,88 @@ function openGate(){document.getElementById('gate').classList.remove('hide');doc
 function closeGate(){document.getElementById('gate').classList.add('hide');document.body.style.overflow='';}
 // Flag source = the SAME host as the (working) menu flags. SVG has no width/height,
 // so we fetch it, add a size, and rasterize to a bitmap usable by both WebGL and 2D canvas.
-// Real flag PNG (has an intrinsic size; the menu's SVGs are sizeless) from jsdelivr — the SAME host
-// as the working menu flags, loaded as a plain <img> (no fetch). Rendered on a pure 2D canvas:
-// vertical strips offset by a sine wave + per-strip shading (pseudo-3D) + zoom-through.
-// NO WebGL — that path returned a BLANK non-power-of-two texture in WebGL1. Draws frame 0 at once
-// and has a safety timeout, so the flag always shows and the gate always opens.
+// Real flag PNG (intrinsic size) from jsdelivr — SAME host as the working menu flags, loaded as a
+// plain <img> (no fetch). Tries a true 3D WebGL cloth (with the NPOT-texture fixes that made it blank
+// before); on ANY WebGL problem it falls back to a bulletproof 2D waving flag. So it's never blank.
 const FLAGIMG='https://cdn.jsdelivr.net/npm/svg-country-flags@1.2.10/png1000px/';
+function mkCanvas(){ const c=document.createElement('canvas');
+  c.style.cssText='position:fixed;inset:0;z-index:2147483647;width:100vw;height:100vh;pointer-events:none;display:block';
+  document.body.appendChild(c); return c; }
 function flyFlag(iso,done){
   const img=new Image();
-  img.onload=()=>runFly(img,done);
+  img.onload=()=>{
+    const oc=document.createElement('canvas'); const w=img.naturalWidth||1000, h=img.naturalHeight||750;
+    oc.width=w; oc.height=h; oc.getContext('2d').drawImage(img,0,0,w,h);
+    let wgl=false; try{const t=document.createElement('canvas'); wgl=!!(window.THREE&&(t.getContext('webgl')||t.getContext('experimental-webgl')));}catch(e){}
+    if(wgl) runFly3D(oc,done); else runFly2D(oc,done);
+  };
   img.onerror=()=>done&&done();
   img.src=FLAGIMG+iso+'.png';
 }
-function runFly(img,done){
-  const cv=document.getElementById('flycanvas');
-  cv.style.zIndex='2147483647'; cv.style.display='block'; cv.style.opacity='1';
-  const dpr=Math.min(devicePixelRatio||1,2), W=innerWidth, H=innerHeight;
+function runFly3D(oc,done){
+  let cv,rnd,geo,mat,tex,guard,raf=0,fin=false;
+  function cleanup(){ try{cv&&cv.remove();geo&&geo.dispose();mat&&mat.dispose();tex&&tex.dispose();rnd&&rnd.dispose();}catch(_){}}
+  function bail(){ if(fin)return; fin=true; clearTimeout(guard); if(raf)cancelAnimationFrame(raf); cleanup(); runFly2D(oc,done); }
+  function finish(){ if(fin)return; fin=true; clearTimeout(guard); if(raf)cancelAnimationFrame(raf); cleanup(); done&&done(); }
+  try{
+    cv=mkCanvas();
+    rnd=new THREE.WebGLRenderer({canvas:cv,alpha:true,antialias:true});
+    rnd.setPixelRatio(Math.min(devicePixelRatio||1,2)); rnd.setSize(innerWidth,innerHeight);
+    if(THREE.sRGBEncoding) rnd.outputEncoding=THREE.sRGBEncoding;
+    const scene=new THREE.Scene();
+    var cam=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,0.1,100); cam.position.z=4.4;
+    scene.add(new THREE.AmbientLight(0xffffff,0.92));
+    const dl=new THREE.DirectionalLight(0xffffff,0.95); dl.position.set(2.5,3,5); scene.add(dl);
+    geo=new THREE.PlaneGeometry(7,4.2,56,34);
+    var base=Float32Array.from(geo.attributes.position.array);
+    tex=new THREE.CanvasTexture(oc);
+    tex.minFilter=THREE.LinearFilter; tex.generateMipmaps=false;      // NPOT-safe: this is what fixes the blank
+    tex.wrapS=tex.wrapT=THREE.ClampToEdgeWrapping;
+    if(THREE.sRGBEncoding) tex.encoding=THREE.sRGBEncoding;
+    tex.needsUpdate=true;
+    mat=new THREE.MeshPhongMaterial({map:tex,side:THREE.DoubleSide,shininess:6});
+    var flag=new THREE.Mesh(geo,mat); scene.add(flag);
+    var t0=null;
+    guard=setTimeout(finish,3200);
+    (function frame(ts){
+      if(fin)return;
+      try{
+        if(t0===null)t0=ts; const t=(ts-t0)/1000, p=Math.min(t/1.9,1);
+        const pos=geo.attributes.position;
+        for(let i=0;i<pos.count;i++){const x=base[i*3],y=base[i*3+1],nx=(x+3.5)/7;
+          pos.array[i*3+2]=Math.sin(nx*6.0-t*5.5)*0.5*nx + Math.sin(y*3.2+t*3.0)*0.07;}
+        pos.needsUpdate=true; geo.computeVertexNormals();
+        const e=p<0.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
+        cam.position.z=4.4-e*6.7; cam.position.x=Math.sin(p*Math.PI)*0.6; flag.rotation.y=Math.sin(t*0.8)*0.05;
+        rnd.render(scene,cam);
+        cv.style.opacity=p>0.82?String(Math.max(0,1-(p-0.82)/0.18)):'1';
+        if(p<1)raf=requestAnimationFrame(frame); else finish();
+      }catch(e){ bail(); }    // e.g. a texture-upload SecurityError -> drop to 2D
+    })();
+  }catch(e){ bail(); }
+}
+function runFly2D(oc,done){    // bulletproof: pure 2D, draws frame 0 at once, safety timeout
+  const cv=mkCanvas(); const dpr=Math.min(devicePixelRatio||1,2), W=innerWidth, H=innerHeight;
   cv.width=Math.max(1,Math.floor(W*dpr)); cv.height=Math.max(1,Math.floor(H*dpr));
   const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
-  const IW=img.naturalWidth||1000, IH=img.naturalHeight||750;
-  const DUR=1700; let start=null, raf=0, fin=false;
+  const IW=oc.width, IH=oc.height, DUR=1700; let start=null, raf=0, fin=false;
   function frame(t){
-    const e=t<0?0:t>1?1:t;
-    ctx.clearRect(0,0,W,H);
-    const base=Math.min(W/IW,H/IH)*0.92, zoom=base*(1+e*e*6.5);
+    const e=t<0?0:t>1?1:t; ctx.clearRect(0,0,W,H);
+    const b=Math.min(W/IW,H/IH)*0.92, zoom=b*(1+e*e*6.5);
     const dw=IW*zoom, dh=IH*zoom, cx=W/2, cy=H/2, left=cx-dw/2, top=cy-dh/2;
     const N=64, ssw=IW/N, dsw=dw/N, amp=dh*0.07*(1-e*0.5), phase=t*Math.PI*4;
     ctx.globalAlpha=e<0.72?1:Math.max(0,1-(e-0.72)/0.28);
-    for(let i=0;i<N;i++){
-      const wob=Math.sin(i/N*Math.PI*3+phase), yo=wob*amp, dx=left+i*dsw;
-      ctx.drawImage(img,i*ssw,0,ssw,IH, dx,top+yo, dsw+1,dh);
-      if(wob<0){ctx.fillStyle='rgba(0,0,0,'+(0.30*-wob)+')';ctx.fillRect(dx,top+yo,dsw+1,dh);}
-      else{ctx.fillStyle='rgba(255,255,255,'+(0.16*wob)+')';ctx.fillRect(dx,top+yo,dsw+1,dh);}
-    }
+    for(let i=0;i<N;i++){ const wob=Math.sin(i/N*Math.PI*3+phase), yo=wob*amp, dx=left+i*dsw;
+      ctx.drawImage(oc,i*ssw,0,ssw,IH, dx,top+yo, dsw+1,dh);
+      ctx.fillStyle= wob<0? 'rgba(0,0,0,'+(0.30*-wob)+')' : 'rgba(255,255,255,'+(0.16*wob)+')';
+      ctx.fillRect(dx,top+yo,dsw+1,dh); }
     ctx.globalAlpha=1;
   }
-  frame(0);                                    // show something immediately, even if rAF is throttled
-  function loop(ts){ if(fin)return; if(start===null)start=ts; const t=(ts-start)/DUR; frame(t);
-    if(t>=1){finish();return;} raf=requestAnimationFrame(loop); }
-  function finish(){ if(fin)return; fin=true; if(raf)cancelAnimationFrame(raf); clearTimeout(guard);
-    cv.style.display='none'; cv.style.opacity='1'; done&&done(); }
-  const guard=setTimeout(finish,DUR+1200);     // never leave the overlay stuck
+  frame(0);
+  function loop(ts){ if(fin)return; if(start===null)start=ts; frame((ts-start)/DUR);
+    if((ts-start)/DUR>=1){finish();return;} raf=requestAnimationFrame(loop); }
+  function finish(){ if(fin)return; fin=true; if(raf)cancelAnimationFrame(raf); clearTimeout(guard); cv.remove(); done&&done(); }
+  const guard=setTimeout(finish,DUR+1200);
   raf=requestAnimationFrame(loop);
 }
 document.querySelectorAll('.langopt').forEach(b=>b.onclick=()=>{

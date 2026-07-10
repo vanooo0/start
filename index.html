@@ -1,4 +1,4 @@
-<title>Flip — твой аккаунт работает сам</title>
+<title>Flip — your account works on its own</title>
 <style>
 :root{
   --bg:#070a10; --bg2:#0b1018; --ink:#eaf1f7; --soft:#9db0c0; --dim:#5f7383;
@@ -8,10 +8,35 @@
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{margin:0;background:var(--bg);color:var(--ink);
-  font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,sans-serif;
+  font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,"Noto Sans Arabic",sans-serif;
   -webkit-font-smoothing:antialiased;overflow-x:hidden}
 .mono{font-family:ui-monospace,"SF Mono","JetBrains Mono",Consolas,monospace}
 .wrap{max-width:760px;margin:0 auto;padding:0 24px}
+[dir="rtl"] .lede,[dir="rtl"] .row p,[dir="rtl"] .row h3{text-align:right}
+
+/* ---- language gate (first step) ---- */
+#gate{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:24px;
+  background:radial-gradient(120% 90% at 50% 30%,#0c1a22,#04060a 85%)}
+#gate.hide{display:none}
+.gate-card{max-width:440px;width:100%;text-align:center}
+.globe{font-size:46px;margin-bottom:14px;animation:spin 14s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.gate-t{font-size:24px;font-weight:750;letter-spacing:-.4px;margin-bottom:8px}
+.gate-s{color:var(--soft);font-size:13.5px;margin-bottom:26px;line-height:1.5}
+.gate-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.langopt{display:flex;align-items:center;gap:10px;justify-content:flex-start;
+  background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 16px;
+  color:var(--ink);font-size:15px;font-weight:550;cursor:pointer;transition:.15s;font-family:inherit}
+.langopt:hover{border-color:var(--cyan);background:#0f1a1e}
+.langopt .fl{font-size:19px}
+@media(max-width:420px){.gate-grid{grid-template-columns:1fr}}
+
+/* ---- language switcher ---- */
+#langbtn{position:fixed;top:16px;right:16px;z-index:40;background:rgba(11,16,24,.7);backdrop-filter:blur(6px);
+  border:1px solid var(--line);border-radius:999px;padding:7px 13px;color:var(--soft);font-size:13px;
+  cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:7px}
+#langbtn:hover{color:var(--ink);border-color:var(--cyan)}
+[dir="rtl"] #langbtn{right:auto;left:16px}
 
 /* ---- shared section rhythm ---- */
 section{position:relative;min-height:100vh;display:flex;align-items:center;padding:96px 0}
@@ -64,86 +89,253 @@ h2{font-size:clamp(30px,5.5vw,48px);line-height:1.08;margin:0 0 20px;font-weight
 .step-mini{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:26px 0 30px}
 .step-mini span{font-size:13.5px;color:var(--soft);background:var(--bg2);border:1px solid var(--line);
   border-radius:999px;padding:8px 15px}
-.share{color:var(--dim);font-size:13.5px;margin-top:22px}
 .note{color:var(--dim);font-size:13px;max-width:52ch;margin:14px auto 0;line-height:1.55}
 
 /* reveal */
 .rise{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1)}
 .rise.in{opacity:1;transform:none}
-@media (prefers-reduced-motion:reduce){.rise{opacity:1;transform:none;transition:none}.scroll .ln{animation:none}}
+@media (prefers-reduced-motion:reduce){.rise{opacity:1;transform:none;transition:none}.scroll .ln,.globe{animation:none}}
 @media (max-width:620px){.cards{grid-template-columns:1fr}section{padding:80px 0}}
 </style>
+
+<div id="gate">
+  <div class="gate-card">
+    <div class="globe">🌍</div>
+    <div class="gate-t">Choose your language</div>
+    <div class="gate-s">Доступно по всему миру · Available worldwide · متاح في كل مكان · 全球可用</div>
+    <div class="gate-grid">
+      <button class="langopt" data-lang="en"><span class="fl">🇬🇧</span>English</button>
+      <button class="langopt" data-lang="ru"><span class="fl">🇷🇺</span>Русский</button>
+      <button class="langopt" data-lang="es"><span class="fl">🇪🇸</span>Español</button>
+      <button class="langopt" data-lang="pt"><span class="fl">🇧🇷</span>Português</button>
+      <button class="langopt" data-lang="tr"><span class="fl">🇹🇷</span>Türkçe</button>
+      <button class="langopt" data-lang="zh"><span class="fl">🇨🇳</span>中文</button>
+      <button class="langopt" data-lang="ar"><span class="fl">🇸🇦</span>العربية</button>
+    </div>
+  </div>
+</div>
+
+<button id="langbtn">🌐 <span id="langlabel">English</span></button>
 
 <section id="hero">
   <canvas id="gl"></canvas>
   <div class="wrap">
-    <div class="badge"><span class="d"></span>MEXC · пары без комиссии</div>
-    <h1>Твой аккаунт <span class="grad">работает сам</span></h1>
-    <p class="lede">Подключаешь свой аккаунт за три минуты. Дальше он торгует без тебя — а ты в любой момент видишь, сколько заработал.</p>
+    <div class="badge"><span class="d"></span><span data-i18n="badge"></span></div>
+    <h1><span data-i18n="h1a"></span> <span class="grad" data-i18n="h1b"></span></h1>
+    <p class="lede" data-i18n="hero_lede"></p>
   </div>
-  <div class="scroll"><span>листай</span><span class="ln"></span></div>
+  <div class="scroll"><span data-i18n="scroll"></span><span class="ln"></span></div>
 </section>
 
 <section id="what">
   <div class="wrap">
-    <div class="eyebrow rise">в курс дела</div>
-    <h2 class="rise">Откуда вообще берётся профит</h2>
-    <p class="lede rise">Цена на бирже иногда чуть отстаёт от справедливой — на доли секунды. Наш движок ловит этот момент и заходит на догон. А на этих парах нет комиссии, поэтому даже крошечный догон уходит в плюс.</p>
+    <div class="eyebrow rise" data-i18n="what_eyebrow"></div>
+    <h2 class="rise" data-i18n="what_h2"></h2>
+    <p class="lede rise" data-i18n="what_lede"></p>
     <div class="cards">
-      <div class="card rise">
-        <canvas class="cv" data-viz="gap"></canvas>
-        <h3>Отставание</h3>
-        <p>Момент, когда биржа не успела за честной ценой. Это и есть наша добыча.</p>
-      </div>
-      <div class="card rise">
-        <canvas class="cv" data-viz="zero"></canvas>
-        <h3>Ноль комиссии</h3>
-        <p>На выбранных парах биржа не берёт сбор. Весь догон остаётся тебе.</p>
-      </div>
-      <div class="card rise">
-        <canvas class="cv" data-viz="fast"></canvas>
-        <h3>Секундные входы</h3>
-        <p>Сделка живёт секунды. Зашли, забрали догон, вышли — и снова ждём момент.</p>
-      </div>
+      <div class="card rise"><canvas class="cv" data-viz="gap"></canvas>
+        <h3 data-i18n="card_gap_h"></h3><p data-i18n="card_gap_p"></p></div>
+      <div class="card rise"><canvas class="cv" data-viz="zero"></canvas>
+        <h3 data-i18n="card_zero_h"></h3><p data-i18n="card_zero_p"></p></div>
+      <div class="card rise"><canvas class="cv" data-viz="fast"></canvas>
+        <h3 data-i18n="card_fast_h"></h3><p data-i18n="card_fast_p"></p></div>
     </div>
   </div>
 </section>
 
 <section id="how">
   <div class="wrap">
-    <div class="eyebrow rise">как это устроено</div>
-    <h2 class="rise">Ты держишь ключи. Мы держим движок.</h2>
-    <p class="lede rise">Никакого доступа к твоим деньгам мы не получаем. Ты остаёшься полным хозяином аккаунта — движок только подсказывает ходы.</p>
+    <div class="eyebrow rise" data-i18n="how_eyebrow"></div>
+    <h2 class="rise" data-i18n="how_h2"></h2>
+    <p class="lede rise" data-i18n="how_lede"></p>
     <div class="rows">
-      <div class="row rise"><span class="m">🔑</span><div><h3>Твой вход остаётся у тебя</h3><p>Расширение работает в твоём браузере, под твоим логином. Оператор твой доступ не видит.</p></div></div>
-      <div class="row rise"><span class="m">🚫</span><div><h3>Вывести твои деньги нельзя</h3><p>Любой вывод требует твоего подтверждения на бирже. Технически увести баланс невозможно.</p></div></div>
-      <div class="row rise"><span class="m">⚡</span><div><h3>Движок присылает ходы — аккаунт исполняет</h3><p>Ты ничего не нажимаешь. Всё происходит само, пока ты занят своими делами.</p></div></div>
-      <div class="row rise"><span class="m">⏸</span><div><h3>Стоп в любой момент</h3><p>Выключил расширение или вышел из биржи — и всё замерло. Ты ничем не связан.</p></div></div>
+      <div class="row rise"><span class="m">🔑</span><div><h3 data-i18n="row1_h"></h3><p data-i18n="row1_p"></p></div></div>
+      <div class="row rise"><span class="m">🚫</span><div><h3 data-i18n="row2_h"></h3><p data-i18n="row2_p"></p></div></div>
+      <div class="row rise"><span class="m">⚡</span><div><h3 data-i18n="row3_h"></h3><p data-i18n="row3_p"></p></div></div>
+      <div class="row rise"><span class="m">🌍</span><div><h3 data-i18n="row4_h"></h3><p data-i18n="row4_p"></p></div></div>
+      <div class="row rise"><span class="m">⏸</span><div><h3 data-i18n="row5_h"></h3><p data-i18n="row5_p"></p></div></div>
     </div>
-    <div class="blackbox rise">
-      <div class="k">а как именно движок находит моменты?</div>
-      <p>Это наша кухня — годы настройки и живой статистики. Тебе её знать не нужно: ты просто подключаешься и получаешь свою долю с того, что заработал твой аккаунт.</p>
-    </div>
+    <div class="blackbox rise"><div class="k" data-i18n="bb_k"></div><p data-i18n="bb_p"></p></div>
   </div>
 </section>
 
 <section id="join">
   <div class="wrap">
     <div class="box rise">
-      <div class="eyebrow" style="color:var(--amber)">поехали</div>
-      <h2>Три минуты — и аккаунт в деле</h2>
+      <div class="eyebrow" style="color:var(--amber)" data-i18n="join_eyebrow"></div>
+      <h2 data-i18n="join_h2"></h2>
       <div class="step-mini">
-        <span>1 · получаешь свой файл</span>
-        <span>2 · ставишь расширение</span>
-        <span>3 · заходишь в MEXC</span>
+        <span data-i18n="step1"></span><span data-i18n="step2"></span><span data-i18n="step3"></span>
       </div>
-      <p class="lede" style="margin:0 auto;text-align:center">Дальше он работает сам. Готов — напиши оператору, который прислал тебе эту ссылку.</p>
-      <p class="note">Профит делим по договорённости: считается по логу каждой сделки, прозрачно. Аккаунт и деньги всё время твои.</p>
+      <p class="lede" style="margin:0 auto;text-align:center" data-i18n="join_lede"></p>
+      <p class="note" data-i18n="note"></p>
     </div>
   </div>
 </section>
 
 <script>
+const I18N={
+ en:{name:"English",badge:"MEXC · zero-fee pairs",h1a:"Your account",h1b:"works on its own",
+  hero_lede:"Connect your account in three minutes. After that it trades without you — and you can see how much you've earned at any time.",
+  scroll:"scroll",what_eyebrow:"the idea",what_h2:"Where the profit comes from",
+  what_lede:"Sometimes the exchange price lags the fair price by a fraction of a second. Our engine catches that moment and rides the catch-up. These pairs have zero fees, so even a tiny catch-up ends in profit.",
+  card_gap_h:"The lag",card_gap_p:"The moment the exchange hasn't caught up to the fair price. That's our catch.",
+  card_zero_h:"Zero fees",card_zero_p:"On the chosen pairs the exchange takes no cut. The whole catch-up stays yours.",
+  card_fast_h:"Second-long entries",card_fast_p:"A trade lives seconds. Enter, take the catch-up, exit — then wait for the next moment.",
+  how_eyebrow:"how it works",how_h2:"You hold the keys. We hold the engine.",
+  how_lede:"We never get access to your money. You stay the full owner of your account — the engine only suggests the moves.",
+  row1_h:"Your login stays with you",row1_p:"The extension runs in your browser, under your login. The operator never sees your access.",
+  row2_h:"Your money can't be withdrawn",row2_p:"Any withdrawal needs your confirmation on the exchange. Draining the balance is technically impossible.",
+  row3_h:"The engine sends moves — your account executes",row3_p:"You press nothing. It all happens on its own while you go about your day.",
+  row4_h:"Works from any location",row4_p:"Trades go out from your own internet, with no tie to a country. Wherever you are, it works.",
+  row5_h:"Stop anytime",row5_p:"Turn off the extension or log out of the exchange — everything freezes. You're not locked into anything.",
+  bb_k:"so how does the engine find the moments?",
+  bb_p:"That's our kitchen — years of tuning and live statistics. You don't need to know it: you just connect and take your share of what your account earns.",
+  join_eyebrow:"let's go",join_h2:"Three minutes — and your account is in play",
+  step1:"1 · get your file",step2:"2 · install the extension",step3:"3 · log into MEXC",
+  join_lede:"After that it works on its own. Ready? Message the operator who sent you this link.",
+  note:"We split the profit as agreed: counted from the log of every trade, transparently. Your account and your money are always yours."},
+ ru:{name:"Русский",badge:"MEXC · пары без комиссии",h1a:"Твой аккаунт",h1b:"работает сам",
+  hero_lede:"Подключаешь свой аккаунт за три минуты. Дальше он торгует без тебя — а ты в любой момент видишь, сколько заработал.",
+  scroll:"листай",what_eyebrow:"в курс дела",what_h2:"Откуда берётся профит",
+  what_lede:"Цена на бирже иногда чуть отстаёт от справедливой — на доли секунды. Наш движок ловит этот момент и заходит на догон. На этих парах нет комиссии, поэтому даже крошечный догон уходит в плюс.",
+  card_gap_h:"Отставание",card_gap_p:"Момент, когда биржа не успела за честной ценой. Это и есть наша добыча.",
+  card_zero_h:"Ноль комиссии",card_zero_p:"На выбранных парах биржа не берёт сбор. Весь догон остаётся тебе.",
+  card_fast_h:"Секундные входы",card_fast_p:"Сделка живёт секунды. Зашли, забрали догон, вышли — и снова ждём момент.",
+  how_eyebrow:"как это устроено",how_h2:"Ты держишь ключи. Мы держим движок.",
+  how_lede:"Никакого доступа к твоим деньгам мы не получаем. Ты остаёшься полным хозяином аккаунта — движок только подсказывает ходы.",
+  row1_h:"Твой вход остаётся у тебя",row1_p:"Расширение работает в твоём браузере, под твоим логином. Оператор твой доступ не видит.",
+  row2_h:"Вывести твои деньги нельзя",row2_p:"Любой вывод требует твоего подтверждения на бирже. Технически увести баланс невозможно.",
+  row3_h:"Движок присылает ходы — аккаунт исполняет",row3_p:"Ты ничего не нажимаешь. Всё происходит само, пока ты занят своими делами.",
+  row4_h:"Работает из любой точки мира",row4_p:"Сделки идут с твоего интернета, без привязки к стране. Где бы ты ни был — работает.",
+  row5_h:"Стоп в любой момент",row5_p:"Выключил расширение или вышел из биржи — и всё замерло. Ты ничем не связан.",
+  bb_k:"а как именно движок находит моменты?",
+  bb_p:"Это наша кухня — годы настройки и живой статистики. Тебе её знать не нужно: ты просто подключаешься и получаешь свою долю с того, что заработал твой аккаунт.",
+  join_eyebrow:"поехали",join_h2:"Три минуты — и аккаунт в деле",
+  step1:"1 · получаешь свой файл",step2:"2 · ставишь расширение",step3:"3 · заходишь в MEXC",
+  join_lede:"Дальше он работает сам. Готов — напиши оператору, который прислал тебе эту ссылку.",
+  note:"Профит делим по договорённости: считается по логу каждой сделки, прозрачно. Аккаунт и деньги всё время твои."},
+ es:{name:"Español",badge:"MEXC · pares sin comisión",h1a:"Tu cuenta",h1b:"trabaja sola",
+  hero_lede:"Conecta tu cuenta en tres minutos. Después opera sin ti — y en cualquier momento ves cuánto has ganado.",
+  scroll:"desliza",what_eyebrow:"la idea",what_h2:"De dónde sale la ganancia",
+  what_lede:"A veces el precio del exchange se retrasa frente al precio justo, por fracciones de segundo. Nuestro motor capta ese momento y aprovecha el alcance. Estos pares no tienen comisión, así que incluso un alcance mínimo termina en ganancia.",
+  card_gap_h:"El retraso",card_gap_p:"El momento en que el exchange no alcanzó el precio justo. Esa es nuestra presa.",
+  card_zero_h:"Cero comisiones",card_zero_p:"En los pares elegidos el exchange no cobra nada. Todo el alcance es tuyo.",
+  card_fast_h:"Entradas de segundos",card_fast_p:"Una operación dura segundos. Entras, tomas el alcance, sales — y esperas el siguiente momento.",
+  how_eyebrow:"cómo funciona",how_h2:"Tú tienes las llaves. Nosotros, el motor.",
+  how_lede:"Nunca accedemos a tu dinero. Sigues siendo el dueño total de tu cuenta — el motor solo sugiere los movimientos.",
+  row1_h:"Tu acceso se queda contigo",row1_p:"La extensión funciona en tu navegador, bajo tu sesión. El operador no ve tu acceso.",
+  row2_h:"Tu dinero no se puede retirar",row2_p:"Cualquier retiro exige tu confirmación en el exchange. Vaciar el saldo es técnicamente imposible.",
+  row3_h:"El motor envía las jugadas — tu cuenta las ejecuta",row3_p:"No pulsas nada. Todo ocurre solo mientras haces tu vida.",
+  row4_h:"Funciona desde cualquier lugar",row4_p:"Las operaciones salen desde tu propia conexión, sin atarse a un país. Estés donde estés, funciona.",
+  row5_h:"Detente cuando quieras",row5_p:"Apaga la extensión o cierra sesión en el exchange — y todo se congela. No estás atado a nada.",
+  bb_k:"¿y cómo encuentra el motor esos momentos?",
+  bb_p:"Esa es nuestra cocina — años de ajuste y estadística real. No necesitas saberlo: solo te conectas y recibes tu parte de lo que gana tu cuenta.",
+  join_eyebrow:"vamos",join_h2:"Tres minutos — y tu cuenta está en juego",
+  step1:"1 · recibes tu archivo",step2:"2 · instalas la extensión",step3:"3 · entras en MEXC",
+  join_lede:"Después trabaja sola. ¿Listo? Escribe al operador que te envió este enlace.",
+  note:"Repartimos la ganancia según lo acordado: se calcula desde el registro de cada operación, con transparencia. Tu cuenta y tu dinero siempre son tuyos."},
+ pt:{name:"Português",badge:"MEXC · pares sem taxa",h1a:"Sua conta",h1b:"trabalha sozinha",
+  hero_lede:"Conecte sua conta em três minutos. Depois ela opera sem você — e a qualquer momento você vê quanto já ganhou.",
+  scroll:"deslize",what_eyebrow:"a ideia",what_h2:"De onde vem o lucro",
+  what_lede:"Às vezes o preço da corretora atrasa em relação ao preço justo, por frações de segundo. Nosso motor pega esse momento e aproveita a recuperação. Esses pares não têm taxa, então até uma recuperação mínima termina em lucro.",
+  card_gap_h:"O atraso",card_gap_p:"O momento em que a corretora não acompanhou o preço justo. Essa é a nossa presa.",
+  card_zero_h:"Zero taxa",card_zero_p:"Nos pares escolhidos a corretora não cobra nada. Toda a recuperação fica com você.",
+  card_fast_h:"Entradas de segundos",card_fast_p:"Uma operação dura segundos. Entra, pega a recuperação, sai — e espera o próximo momento.",
+  how_eyebrow:"como funciona",how_h2:"Você tem as chaves. Nós temos o motor.",
+  how_lede:"Nunca temos acesso ao seu dinheiro. Você continua dono total da conta — o motor só sugere as jogadas.",
+  row1_h:"Seu acesso fica com você",row1_p:"A extensão roda no seu navegador, sob o seu login. O operador não vê o seu acesso.",
+  row2_h:"Seu dinheiro não pode ser sacado",row2_p:"Qualquer saque exige a sua confirmação na corretora. Esvaziar o saldo é tecnicamente impossível.",
+  row3_h:"O motor envia as jogadas — sua conta executa",row3_p:"Você não aperta nada. Tudo acontece sozinho enquanto você toca a sua vida.",
+  row4_h:"Funciona de qualquer lugar",row4_p:"As operações saem da sua própria internet, sem amarra a um país. Onde você estiver, funciona.",
+  row5_h:"Pare quando quiser",row5_p:"Desligue a extensão ou saia da corretora — e tudo congela. Você não fica preso a nada.",
+  bb_k:"e como o motor acha esses momentos?",
+  bb_p:"Essa é a nossa cozinha — anos de ajuste e estatística real. Você não precisa saber: é só conectar e receber a sua parte do que a sua conta ganhou.",
+  join_eyebrow:"bora",join_h2:"Três minutos — e a conta está no jogo",
+  step1:"1 · recebe o seu arquivo",step2:"2 · instala a extensão",step3:"3 · entra na MEXC",
+  join_lede:"Depois ela trabalha sozinha. Pronto? Fale com o operador que te enviou este link.",
+  note:"Dividimos o lucro conforme combinado: calculado pelo registro de cada operação, com transparência. Sua conta e seu dinheiro são sempre seus."},
+ tr:{name:"Türkçe",badge:"MEXC · komisyonsuz pariteler",h1a:"Hesabın",h1b:"kendi kendine çalışır",
+  hero_lede:"Hesabını üç dakikada bağla. Sonrası sensiz işlem yapar — ve ne kadar kazandığını istediğin an görürsün.",
+  scroll:"kaydır",what_eyebrow:"fikir",what_h2:"Kâr nereden geliyor",
+  what_lede:"Borsadaki fiyat bazen adil fiyatın gerisinde kalır — saniyenin küçük bir kısmı kadar. Motorumuz bu anı yakalar ve toparlanmadan yararlanır. Bu paritelerde komisyon yok, yani küçücük bir toparlanma bile kâra döner.",
+  card_gap_h:"Gecikme",card_gap_p:"Borsanın adil fiyata yetişemediği an. İşte avımız bu.",
+  card_zero_h:"Sıfır komisyon",card_zero_p:"Seçili paritelerde borsa hiçbir kesinti almaz. Toparlanmanın tamamı sende kalır.",
+  card_fast_h:"Saniyelik girişler",card_fast_p:"Bir işlem saniyeler yaşar. Gir, toparlanmayı al, çık — ve bir sonraki anı bekle.",
+  how_eyebrow:"nasıl çalışır",how_h2:"Anahtarlar sende. Motor bizde.",
+  how_lede:"Paranıza asla erişemeyiz. Hesabın tam sahibi sen kalırsın — motor sadece hamleleri önerir.",
+  row1_h:"Girişin sende kalır",row1_p:"Uzantı senin tarayıcında, senin oturumunla çalışır. Operatör erişimini görmez.",
+  row2_h:"Paran çekilemez",row2_p:"Her çekim borsada senin onayını ister. Bakiyeyi boşaltmak teknik olarak imkânsız.",
+  row3_h:"Motor hamleyi gönderir — hesabın uygular",row3_p:"Hiçbir şeye basmazsın. Sen işine bakarken her şey kendiliğinden olur.",
+  row4_h:"Her konumdan çalışır",row4_p:"İşlemler senin kendi internetinden çıkar, bir ülkeye bağlı değil. Neredeysen orada çalışır.",
+  row5_h:"İstediğin an durdur",row5_p:"Uzantıyı kapat ya da borsadan çık — her şey durur. Hiçbir şeye bağlı değilsin.",
+  bb_k:"peki motor bu anları nasıl buluyor?",
+  bb_p:"Bu bizim mutfağımız — yıllarca ayar ve canlı istatistik. Bilmene gerek yok: sadece bağlanırsın ve hesabının kazandığından payını alırsın.",
+  join_eyebrow:"hadi başlayalım",join_h2:"Üç dakika — ve hesabın oyunda",
+  step1:"1 · dosyanı al",step2:"2 · uzantıyı kur",step3:"3 · MEXC'e giriş yap",
+  join_lede:"Sonrası kendi kendine çalışır. Hazır mısın? Bu bağlantıyı gönderen operatöre yaz.",
+  note:"Kârı anlaştığımız gibi bölüşürüz: her işlemin kaydından, şeffaf biçimde hesaplanır. Hesabın da paran da hep senindir."},
+ zh:{name:"中文",badge:"MEXC · 零手续费交易对",h1a:"你的账户",h1b:"自动为你运转",
+  hero_lede:"三分钟连接你的账户。之后它无需你操作即可交易 — 你随时都能看到赚了多少。",
+  scroll:"下滑",what_eyebrow:"原理",what_h2:"利润从何而来",
+  what_lede:"交易所的价格有时会比公允价格慢上几分之一秒。我们的引擎抓住这一刻，赚取追赶的差价。这些交易对零手续费，所以哪怕极小的追赶也能盈利。",
+  card_gap_h:"价格滞后",card_gap_p:"交易所还没追上公允价格的那一刻。这就是我们的猎物。",
+  card_zero_h:"零手续费",card_zero_p:"在选定的交易对上，交易所不收任何费用。全部差价都归你。",
+  card_fast_h:"秒级进出",card_fast_p:"一笔交易只存活几秒。进场、拿下差价、离场 — 然后等待下一次机会。",
+  how_eyebrow:"如何运作",how_h2:"钥匙在你手里，引擎在我们手里。",
+  how_lede:"我们永远接触不到你的资金。你始终是账户的完全主人 — 引擎只负责提示操作。",
+  row1_h:"你的登录只属于你",row1_p:"扩展在你的浏览器、你的登录下运行。操作方看不到你的账户访问。",
+  row2_h:"你的资金无法被提走",row2_p:"任何提现都需要你在交易所确认。从技术上无法转走余额。",
+  row3_h:"引擎发出指令 — 账户执行",row3_p:"你什么都不用按。你在忙自己的事，一切自动完成。",
+  row4_h:"任何地区都能用",row4_p:"交易从你自己的网络发出，不绑定任何国家。无论你在哪里，都能运行。",
+  row5_h:"随时停止",row5_p:"关闭扩展或退出交易所 — 一切立即冻结。你不受任何约束。",
+  bb_k:"那引擎到底怎么找到这些时机？",
+  bb_p:"这是我们的独门配方 — 多年的调校和实时数据。你不需要知道：你只管接入，然后从账户赚到的钱里拿走你的那份。",
+  join_eyebrow:"出发",join_h2:"三分钟 — 账户就上场了",
+  step1:"1 · 拿到你的文件",step2:"2 · 安装扩展",step3:"3 · 登录 MEXC",
+  join_lede:"之后它自动运转。准备好了吗？联系把这个链接发给你的操作方。",
+  note:"利润按约定分成：依据每一笔交易的记录透明计算。账户和资金始终是你的。"},
+ ar:{name:"العربية",badge:"MEXC · أزواج بدون رسوم",h1a:"حسابك",h1b:"يعمل من تلقاء نفسه",
+  hero_lede:"اربط حسابك في ثلاث دقائق. بعدها يتداول بدونك — وتستطيع أن ترى كم ربحت في أي لحظة.",
+  scroll:"مرّر للأسفل",what_eyebrow:"الفكرة",what_h2:"من أين يأتي الربح",
+  what_lede:"أحيانًا يتأخر سعر المنصة عن السعر العادل بأجزاء من الثانية. محرّكنا يلتقط هذه اللحظة ويستفيد من اللحاق. هذه الأزواج بدون رسوم، لذا حتى أصغر لحاق ينتهي بربح.",
+  card_gap_h:"التأخّر",card_gap_p:"اللحظة التي لم تلحق فيها المنصة بالسعر العادل. هذه هي فريستنا.",
+  card_zero_h:"صفر رسوم",card_zero_p:"في الأزواج المختارة لا تأخذ المنصة أي عمولة. كل اللحاق يبقى لك.",
+  card_fast_h:"دخول بالثواني",card_fast_p:"الصفقة تعيش ثوانٍ. تدخل، تأخذ اللحاق، تخرج — ثم تنتظر اللحظة التالية.",
+  how_eyebrow:"كيف يعمل",how_h2:"أنت تملك المفاتيح. ونحن نملك المحرّك.",
+  how_lede:"لا نصل أبدًا إلى أموالك. تبقى المالك الكامل لحسابك — المحرّك يقترح الحركات فقط.",
+  row1_h:"دخولك يبقى معك",row1_p:"الإضافة تعمل في متصفحك، بتسجيل دخولك. المشغّل لا يرى وصولك.",
+  row2_h:"لا يمكن سحب أموالك",row2_p:"أي سحب يتطلب تأكيدك على المنصة. تفريغ الرصيد مستحيل تقنيًا.",
+  row3_h:"المحرّك يرسل الحركات — وحسابك ينفّذ",row3_p:"لا تضغط شيئًا. كل شيء يحدث تلقائيًا بينما تعيش يومك.",
+  row4_h:"يعمل من أي مكان",row4_p:"الصفقات تخرج من إنترنتك أنت، دون ارتباط بأي بلد. أينما كنت، يعمل.",
+  row5_h:"أوقفه في أي لحظة",row5_p:"أطفئ الإضافة أو اخرج من المنصة — ويتجمّد كل شيء. لست مقيّدًا بأي شيء.",
+  bb_k:"وكيف يجد المحرّك هذه اللحظات؟",
+  bb_p:"هذا مطبخنا — سنوات من الضبط والإحصاء الحيّ. لا تحتاج لمعرفته: تكتفي بالاتصال وتأخذ حصتك مما ربحه حسابك.",
+  join_eyebrow:"هيا بنا",join_h2:"ثلاث دقائق — وحسابك في الملعب",
+  step1:"1 · تستلم ملفك",step2:"2 · تثبّت الإضافة",step3:"3 · تسجّل الدخول إلى MEXC",
+  join_lede:"بعدها يعمل وحده. جاهز؟ راسل المشغّل الذي أرسل لك هذا الرابط.",
+  note:"نقتسم الربح حسب الاتفاق: يُحسب من سجل كل صفقة، بشفافية. حسابك وأموالك تبقى لك دائمًا."}
+};
+const RTL=['ar'];
+function applyLang(code){
+  const d=I18N[code]||I18N.en;
+  document.documentElement.lang=code;
+  document.documentElement.dir=RTL.includes(code)?'rtl':'ltr';
+  document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');if(d[k]!=null)el.textContent=d[k];});
+  document.getElementById('langlabel').textContent=d.name;
+  try{localStorage.setItem('flip_lang',code);}catch(e){}
+}
+function openGate(){document.getElementById('gate').classList.remove('hide');}
+function closeGate(){document.getElementById('gate').classList.add('hide');}
+document.querySelectorAll('.langopt').forEach(b=>b.onclick=()=>{applyLang(b.dataset.lang);closeGate();});
+document.getElementById('langbtn').onclick=openGate;
+(function(){
+  let saved=null;try{saved=localStorage.getItem('flip_lang');}catch(e){}
+  const guess=(navigator.language||'en').slice(0,2);
+  applyLang(saved||(I18N[guess]?guess:'en'));   // fill behind the gate
+  if(saved){closeGate();}                        // returning visitor skips the gate
+})();
+
 /* ---------- hero WebGL: the gap between two prices ---------- */
 (function(){
   const c=document.getElementById('gl');
@@ -157,18 +349,15 @@ h2{font-size:clamp(30px,5.5vw,48px);line-height:1.08;margin:0 0 20px;font-weight
     vec2 uv=(gl_FragCoord.xy/R);
     float x=uv.x;
     vec3 col=vec3(0.027,0.039,0.063);
-    // two price lines: fair (cyan) and lagging (amber), converging & drifting
     float fair=0.5+wave(x*6.2831,T*0.35,0.11,1.0);
     float lag =0.5+wave(x*6.2831,T*0.35-0.9,0.11,1.0)*0.86-0.02;
     float y=uv.y;
     float dF=abs(y-fair), dL=abs(y-lag);
     col+=vec3(0.235,0.878,0.816)*smoothstep(0.028,0.0,dF)*0.9;
     col+=vec3(0.949,0.706,0.243)*smoothstep(0.028,0.0,dL)*0.9;
-    // the gap glow between them
     float lo=min(fair,lag),hi=max(fair,lag);
     float inband=smoothstep(0.0,0.02,y-lo)*smoothstep(0.0,0.02,hi-y);
     col+=vec3(0.15,0.5,0.55)*inband*(0.10+0.06*sin(T*2.0+x*12.0));
-    // drifting particles
     for(int i=0;i<5;i++){
       float fi=float(i);
       vec2 pp=vec2(fract(0.12*fi+T*(0.03+0.01*fi)),0.5+0.25*sin(T*0.5+fi*1.7));
@@ -188,11 +377,10 @@ h2{font-size:clamp(30px,5.5vw,48px);line-height:1.08;margin:0 0 20px;font-weight
   function size(){const d=Math.min(devicePixelRatio||1,2);c.width=c.clientWidth*d;c.height=c.clientHeight*d;gl.viewport(0,0,c.width,c.height);}
   addEventListener('resize',size);size();
   let run=true,t0=null;
-  new IntersectionObserver(es=>{run=es[0].isIntersecting;if(run)req();},{threshold:0.01}).observe(c);
+  new IntersectionObserver(es=>{run=es[0].isIntersecting;if(run)requestAnimationFrame(frame);},{threshold:0.01}).observe(c);
   function frame(ts){if(!run)return;if(t0===null)t0=ts;const t=(ts-t0)/1000;
     gl.uniform2f(uR,c.width,c.height);gl.uniform1f(uT,reduce?3.0:t);
     gl.drawArrays(gl.TRIANGLE_STRIP,0,4);if(!reduce)requestAnimationFrame(frame);}
-  let asked=false;function req(){if(reduce){requestAnimationFrame(frame);return;}if(asked)return;asked=true;requestAnimationFrame(function l(ts){asked=false;frame(ts);});}
   requestAnimationFrame(frame);
 })();
 

@@ -84,6 +84,12 @@ h2{font-size:clamp(30px,5.5vw,48px);line-height:1.08;margin:0 0 20px;font-weight
 /* ---- per-country bespoke scene engine (plays in margins, never over the reading column) ---- */
 #fx{position:fixed;inset:0;z-index:40;pointer-events:none;overflow:hidden}
 #fx *{position:absolute}
+.acc{position:absolute;pointer-events:none;opacity:0;z-index:1;will-change:transform,opacity;
+  filter:drop-shadow(0 2px 6px rgba(0,0,0,.4));transition:opacity .7s ease}
+.acc.seen{opacity:.55}
+@keyframes accSway{0%,100%{transform:translateY(0) rotate(-7deg)}50%{transform:translateY(-9px) rotate(7deg)}}
+@keyframes accSpin{0%,100%{transform:rotate(-10deg)}50%{transform:rotate(10deg)}}
+@media (max-width:860px){.acc{display:none}}
 .eiffel{right:7vw;bottom:6vh;transform-origin:bottom center;opacity:0;filter:drop-shadow(0 4px 7px rgba(0,0,0,.5))}
 .eiffel.go{animation:eifFall 2.7s forwards}
 @keyframes eifFall{
@@ -677,7 +683,21 @@ function applyTheme(code){
         'font-size:'+(22+Math.random()*32).toFixed(0)+'px;opacity:0;'+
         'animation:floatUp '+(9+Math.random()*9).toFixed(1)+'s linear '+(Math.random()*10).toFixed(1)+'s infinite';
       m.appendChild(s); } }
-  document.querySelectorAll('.critter,.hanger').forEach(e=>e.remove());   // bespoke per-country layer to be rebuilt
+  decorateSections(t);
+}
+const accObs=new IntersectionObserver(es=>es.forEach(x=>{ if(x.isIntersecting) x.target.classList.add('seen'); }),{threshold:0.25});
+function decorateSections(t){
+  document.querySelectorAll('.acc').forEach(e=>e.remove());
+  ['what','how','join'].forEach((id,si)=>{
+    const sec=document.getElementById(id); if(!sec) return;
+    for(let i=0;i<2;i++){
+      const s=document.createElement('div'); s.className='acc'; s.textContent=t.e[(si*2+i)%t.e.length];
+      const side=i===0?'left:2.5vw':'right:2.5vw'; const top=(16+i*44+ (si%2)*10)+'%';
+      s.style.cssText='position:absolute;'+side+';top:'+top+';font-size:'+(28+i*6)+'px;'+
+        'animation:'+(i? 'accSpin':'accSway')+' '+(3+Math.random()*2).toFixed(1)+'s ease-in-out infinite';
+      sec.appendChild(s); accObs.observe(s);
+    }
+  });
 }
 function spawnCritters(t){
   document.querySelectorAll('.critter').forEach(e=>e.remove()); CRIT.length=0;

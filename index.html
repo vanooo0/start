@@ -1,3 +1,5 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Flip — your account works on its own</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css">
 <style>
@@ -188,7 +190,18 @@ h2{font-size:clamp(30px,5.5vw,48px);line-height:1.08;margin:0 0 20px;font-weight
 [dir="rtl"] .row:hover{transform:translateX(-4px)}
 @media (prefers-reduced-motion:reduce){.rise{opacity:1;transform:none;transition:none}
   .card:hover,.row:hover{transform:none}.scroll .ln,.globe{animation:none}}
-@media (max-width:620px){.cards{grid-template-columns:1fr}section{padding:80px 0}}
+@media (max-width:620px){
+  section{padding:62px 0}
+  #what,#how,#join{min-height:auto}
+  .cards{grid-template-columns:1fr}
+  .wrap{padding:0 20px}
+  .lede{font-size:16.5px}
+  h1{letter-spacing:-1px}
+  .step-mini{gap:8px}
+  #join .box{padding:34px 20px}
+  #langbtn{top:12px;right:12px;padding:6px 11px;font-size:12px}
+}
+@media (max-width:400px){ .gate-card{max-width:100%} }
 </style>
 
 <div id="gate">

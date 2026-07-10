@@ -25,6 +25,7 @@ body{margin:0;background:var(--bg);color:var(--ink);
 #flyflag{position:fixed;inset:0;z-index:60;background-size:cover;background-position:center;
   opacity:0;pointer-events:none;will-change:transform,opacity}
 #flyflag::after{content:"";position:absolute;inset:0;box-shadow:inset 0 0 220px 60px rgba(0,0,0,.55)}
+#flycanvas{position:fixed;inset:0;z-index:60;display:none;width:100vw;height:100vh;pointer-events:none}
 #flyflag.go{animation:flyin 1.15s cubic-bezier(.45,0,.25,1) forwards}
 @keyframes flyin{
   0%{opacity:0;transform:perspective(1300px) translateZ(-1000px) scale(.22) rotateX(20deg)}
@@ -150,6 +151,7 @@ h2{font-size:clamp(30px,5.5vw,48px);line-height:1.08;margin:0 0 20px;font-weight
 </div>
 
 <div id="flyflag"></div>
+<canvas id="flycanvas"></canvas>
 <button id="langbtn"><span id="langflag">🌐</span> <span id="langlabel">English</span></button>
 
 <section id="hero">
@@ -208,6 +210,7 @@ h2{font-size:clamp(30px,5.5vw,48px);line-height:1.08;margin:0 0 20px;font-weight
   </div>
 </section>
 
+<script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
 <script>
 const I18N={
  en:{name:"English",badge:"MEXC · zero-fee pairs",h1a:"Your account",h1b:"works on its own",
@@ -585,18 +588,46 @@ function applyLang(code){
 }
 function openGate(){document.getElementById('gate').classList.remove('hide');document.body.style.overflow='hidden';}
 function closeGate(){document.getElementById('gate').classList.add('hide');document.body.style.overflow='';}
-const FLAGCDN='https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/';
+const FLAGPNG='https://flagcdn.com/w1280/';
+// 3D waving-flag fly-through: a real cloth mesh ripples while the camera dives through it.
+function flyFlag(iso,done){
+  const cv=document.getElementById('flycanvas');
+  if(!window.THREE){done&&done();return;}
+  cv.style.display='block'; cv.style.opacity='1';
+  const rnd=new THREE.WebGLRenderer({canvas:cv,alpha:true,antialias:true});
+  rnd.setPixelRatio(Math.min(devicePixelRatio||1,2)); rnd.setSize(innerWidth,innerHeight);
+  const scene=new THREE.Scene();
+  const cam=new THREE.PerspectiveCamera(58,innerWidth/innerHeight,0.1,100); cam.position.z=5;
+  scene.add(new THREE.AmbientLight(0xffffff,0.85));
+  const dl=new THREE.DirectionalLight(0xffffff,0.95); dl.position.set(2.5,3,5); scene.add(dl);
+  const geo=new THREE.PlaneGeometry(6,3.6,52,30);
+  const base=Float32Array.from(geo.attributes.position.array);
+  const tex=new THREE.TextureLoader().load(FLAGPNG+iso+'.png');
+  if('SRGBColorSpace' in THREE) tex.colorSpace=THREE.SRGBColorSpace;
+  const mat=new THREE.MeshPhongMaterial({map:tex,side:THREE.DoubleSide,shininess:5});
+  const flag=new THREE.Mesh(geo,mat); scene.add(flag);
+  let t0=null;
+  (function frame(ts){
+    if(t0===null)t0=ts; const t=(ts-t0)/1000, p=Math.min(t/1.6,1);
+    const pos=geo.attributes.position;
+    for(let i=0;i<pos.count;i++){const x=base[i*3],y=base[i*3+1],nx=(x+3)/6;
+      pos.array[i*3+2]=Math.sin(nx*6.0-t*5.5)*0.42*nx + Math.sin(y*3.2+t*3.0)*0.06;}
+    pos.needsUpdate=true; geo.computeVertexNormals();
+    const e=p<0.5?2*p*p:1-Math.pow(-2*p+2,2)/2;         // easeInOut
+    cam.position.z=5-e*6.6; cam.position.x=Math.sin(p*Math.PI)*0.6; flag.rotation.y=Math.sin(t*0.8)*0.05;
+    rnd.render(scene,cam);
+    cv.style.opacity=p>0.8?String(Math.max(0,1-(p-0.8)/0.2)):'1';
+    if(p<1)requestAnimationFrame(frame);
+    else{cv.style.display='none';cv.style.opacity='1';geo.dispose();mat.dispose();tex.dispose();rnd.dispose();done&&done();}
+  })();
+}
 document.querySelectorAll('.langopt').forEach(b=>b.onclick=()=>{
   const code=b.dataset.lang, iso=FLAG[code]||'gb';
   applyLang(code);
   const gate=document.getElementById('gate');
-  if(matchMedia('(prefers-reduced-motion:reduce)').matches){closeGate();return;}
-  const ff=document.getElementById('flyflag');
-  ff.style.backgroundImage="url("+FLAGCDN+iso+".svg)";
-  ff.classList.remove('go'); void ff.offsetWidth; ff.classList.add('go');   // 3D fly-through into the chosen flag
-  gate.style.transition='opacity .45s ease'; gate.style.opacity='0';
-  setTimeout(()=>{ closeGate(); gate.style.opacity=''; gate.style.transition='';
-    ff.classList.remove('go'); ff.style.backgroundImage=''; }, 1120);
+  if(matchMedia('(prefers-reduced-motion:reduce)').matches||!window.THREE){closeGate();return;}
+  gate.style.transition='opacity .4s ease'; gate.style.opacity='0';
+  flyFlag(iso,()=>{ closeGate(); gate.style.opacity=''; gate.style.transition=''; });
 });
 document.getElementById('langbtn').onclick=openGate;
 (function(){

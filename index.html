@@ -68,6 +68,11 @@ h2{font-size:clamp(30px,5.5vw,48px);line-height:1.08;margin:0 0 20px;font-weight
 /* ---- hero ---- */
 #hero{overflow:hidden}
 #gl{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:0}
+#motifs{position:absolute;inset:0;z-index:1;overflow:hidden;pointer-events:none}
+#motifs span{will-change:transform,opacity;filter:saturate(1.1)}
+@keyframes floatUp{0%{transform:translateY(0) rotate(0);opacity:0}
+  12%{opacity:.16}88%{opacity:.16}100%{transform:translateY(-118vh) rotate(14deg);opacity:0}}
+@media (prefers-reduced-motion:reduce){#motifs{display:none}}
 #hero .wrap{position:relative;z-index:2}
 #hero::after{content:"";position:absolute;inset:0;z-index:1;
   background:radial-gradient(120% 90% at 50% 40%,transparent 40%,var(--bg) 92%)}
@@ -156,6 +161,7 @@ h2{font-size:clamp(30px,5.5vw,48px);line-height:1.08;margin:0 0 20px;font-weight
 
 <section id="hero">
   <canvas id="gl"></canvas>
+  <div id="motifs"></div>
   <div class="wrap">
     <div class="badge"><span class="d"></span><span data-i18n="badge"></span></div>
     <h1><span data-i18n="h1a"></span> <span class="grad" data-i18n="h1b"></span></h1>
@@ -577,6 +583,41 @@ const I18N={
 };
 const FLAG={en:'gb',ru:'ru',es:'es',pt:'br',fr:'fr',de:'de',it:'it',tr:'tr',uk:'ua',pl:'pl',id:'id',vi:'vn',hi:'in',zh:'cn',ja:'jp',ko:'kr',ar:'sa',fa:'ir'};
 const RTL=['ar','fa'];
+// Per-country vibe: national accent colors + playful local motifs that drift up the hero.
+const THEME={
+ en:{a:'#ef3340',b:'#4f7fff',e:['☕','⚽','🎩','👑','🌧️']},
+ ru:{a:'#e4181c',b:'#3b6fe0',e:['🐻','🍶','❄️','🪆','🎿']},
+ es:{a:'#f1bf00',b:'#e4181c',e:['💃','🐂','🥘','☀️','🎸']},
+ pt:{a:'#00c65a',b:'#ffdf00',e:['⚽','🏖️','🌴','🥁','☕']},
+ fr:{a:'#4f7fff',b:'#ef3340',e:['🥖','🗼','🧀','🍷','🎨']},
+ de:{a:'#f5c518',b:'#e4181c',e:['🍺','🥨','🚗','🏰','🎼']},
+ it:{a:'#00c65a',b:'#ef3340',e:['🍕','🍝','🛵','🎨','☕']},
+ tr:{a:'#ff2a3c',b:'#8fd3ff',e:['🌙','☕','🧿','🕌','🫖']},
+ uk:{a:'#ffd700',b:'#2f7fe6',e:['🌻','🌾','🕊️','💙']},
+ pl:{a:'#ff3b5c',b:'#e8edf3',e:['🥟','🦅','🏰','⛪']},
+ id:{a:'#ff3b3b',b:'#e8edf3',e:['🏝️','🌋','🦧','🍜']},
+ vi:{a:'#ffcd00',b:'#e4181c',e:['🍜','🛵','🌾','🏮']},
+ hi:{a:'#ff9933',b:'#19a34a',e:['🐘','🕌','🍛','🪷','🪔']},
+ zh:{a:'#ff2d2d',b:'#ffde00',e:['🐉','🏮','🥢','🐼']},
+ ja:{a:'#ff4d6a',b:'#ffd1dc',e:['🗻','🍣','🌸','⛩️']},
+ ko:{a:'#ff4b57',b:'#3b6fe0',e:['🥢','🎎','🌶️','🏯']},
+ ar:{a:'#1fbf6a',b:'#e8edf3',e:['🕌','🐪','☕','🌴','🕋']},
+ fa:{a:'#2bbf5a',b:'#ff3b47',e:['🐱','🌹','🍵','🏺']}
+};
+function shade(hex,f){ const n=parseInt(hex.slice(1),16); let r=(n>>16)&255,g=(n>>8)&255,b=n&255;
+  const t=f<0?0:255,p=Math.abs(f); r=Math.round(r+(t-r)*p);g=Math.round(g+(t-g)*p);b=Math.round(b+(t-b)*p);
+  return '#'+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1); }
+function applyTheme(code){
+  const t=THEME[code]||THEME.en, r=document.documentElement.style;
+  r.setProperty('--cyan',t.a); r.setProperty('--amber',t.b); r.setProperty('--cyan-dim',shade(t.a,-0.62));
+  const m=document.getElementById('motifs'); if(!m)return; m.innerHTML='';
+  for(let i=0;i<14;i++){ const s=document.createElement('span');
+    s.textContent=t.e[i%t.e.length];
+    s.style.cssText='position:absolute;left:'+(Math.random()*100).toFixed(1)+'%;bottom:-8vh;'+
+      'font-size:'+(20+Math.random()*34).toFixed(0)+'px;opacity:0;'+
+      'animation:floatUp '+(9+Math.random()*9).toFixed(1)+'s linear '+(Math.random()*10).toFixed(1)+'s infinite';
+    m.appendChild(s); }
+}
 function applyLang(code){
   const d=I18N[code]||I18N.en;
   document.documentElement.lang=code;
@@ -584,6 +625,7 @@ function applyLang(code){
   document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');if(d[k]!=null)el.textContent=d[k];});
   document.getElementById('langlabel').textContent=d.name;
   const lf=document.getElementById('langflag');lf.textContent='';lf.className='fi fi-'+(FLAG[code]||'gb');
+  applyTheme(code);
   try{localStorage.setItem('flip_lang',code);}catch(e){}
 }
 function openGate(){document.getElementById('gate').classList.remove('hide');document.body.style.overflow='hidden';}
@@ -597,7 +639,7 @@ const FLAGDATA={"gb": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQwIiBoZWlnaHQ
 function mkCanvas(){ const c=document.createElement('canvas');
   c.style.cssText='position:fixed;inset:0;z-index:2147483647;width:100vw;height:100vh;pointer-events:none;display:block';
   document.body.appendChild(c); return c; }
-function dbg(m){ let d=document.getElementById('dbg');
+function dbg(m){ if(!/debug/.test(location.search))return; let d=document.getElementById('dbg');
   if(!d){ d=document.createElement('div'); d.id='dbg';
     d.style.cssText='position:fixed;top:0;left:0;max-width:100vw;z-index:2147483647;background:rgba(0,0,0,.85);color:#39ff5a;font:12px/1.45 monospace;padding:7px 9px;pointer-events:none;border-bottom-right-radius:8px';
     const log=document.createElement('div'); log.id='dbglog'; log.style.whiteSpace='pre-wrap';
@@ -617,11 +659,12 @@ function flyFlag(iso,done){
   dbg('flyFlag iso='+iso+' dataLen='+((FLAGDATA[iso]||'').length));
   const img=new Image();
   img.onload=()=>{
-    const oc=document.createElement('canvas'); const w=img.naturalWidth||1000, h=img.naturalHeight||750;
-    oc.width=w; oc.height=h; const octx=oc.getContext('2d'); octx.drawImage(img,0,0,w,h);
-    let px='?'; try{const d=octx.getImageData(w>>1,h>>1,1,1).data; px=d[0]+','+d[1]+','+d[2]+',a'+d[3];}catch(e){px='taint';}
-    dbg('img LOADED '+w+'x'+h+' центр.пиксель='+px);
-    runFly2D(oc,done);          // force the reliable 2D path (3D rendered invisibly on this machine)
+    const nw=img.naturalWidth||640, nh=img.naturalHeight||480, SC=Math.max(2,Math.min(3,1920/nw));
+    const oc=document.createElement('canvas'); oc.width=Math.round(nw*SC); oc.height=Math.round(nh*SC);
+    const octx=oc.getContext('2d'); octx.imageSmoothingEnabled=true; octx.imageSmoothingQuality='high';
+    octx.drawImage(img,0,0,oc.width,oc.height);   // rasterize the vector flag at high res -> crisp when zoomed
+    dbg('img '+nw+'x'+nh+' -> '+oc.width+'x'+oc.height);
+    runFly2D(oc,done);          // reliable 2D path (3D rendered invisibly on this machine)
   };
   img.onerror=()=>{ dbg('img ERROR (флаг не загрузился)'); done&&done(); };
   img.src=FLAGDATA[iso]||FLAGDATA.gb;
@@ -674,7 +717,8 @@ function runFly2D(oc,done){    // bulletproof: pure 2D, draws frame 0 at once, s
   const cv=mkCanvas(); const dpr=Math.min(devicePixelRatio||1,2), W=innerWidth, H=innerHeight;
   cv.width=Math.max(1,Math.floor(W*dpr)); cv.height=Math.max(1,Math.floor(H*dpr));
   const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
-  const IW=oc.width, IH=oc.height, DUR=1700; let start=null, raf=0, fin=false;
+  ctx.imageSmoothingEnabled=true; ctx.imageSmoothingQuality='high';
+  const IW=oc.width, IH=oc.height, DUR=1050; let start=null, raf=0, fin=false;
   function frame(t){
     const e=t<0?0:t>1?1:t; ctx.clearRect(0,0,W,H);
     const b=Math.min(W/IW,H/IH)*0.92, zoom=b*(1+e*e*6.5);

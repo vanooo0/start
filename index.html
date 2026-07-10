@@ -1,5 +1,9 @@
 <title>Flip — your account works on its own</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css">
 <style>
+.fi{border-radius:3px;background-size:cover;background-position:center}
+.langopt .fl{font-size:16px;flex:none}
+#langbtn .fi{font-size:15px}
 :root{
   --bg:#070a10; --bg2:#0b1018; --ink:#eaf1f7; --soft:#9db0c0; --dim:#5f7383;
   --line:#18222e; --card:#0e151f;
@@ -24,14 +28,8 @@ body{margin:0;background:var(--bg);color:var(--ink);
 .gate-card{max-height:92vh;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none}
 .gate-card::-webkit-scrollbar{display:none}
 .gate-t{font-size:24px;font-weight:750;letter-spacing:-.4px;margin-bottom:8px}
-.gate-s{color:var(--soft);font-size:13.5px;margin-bottom:16px;line-height:1.5}
-.flagbar{overflow:hidden;margin:0 auto 22px;max-width:340px;
-  -webkit-mask-image:linear-gradient(90deg,transparent,#000 15%,#000 85%,transparent);
-  mask-image:linear-gradient(90deg,transparent,#000 15%,#000 85%,transparent)}
-.flagtrack{display:flex;gap:12px;width:max-content;font-size:22px;animation:marq 26s linear infinite}
-@keyframes marq{to{transform:translateX(-50%)}}
+.gate-s{color:var(--soft);font-size:13.5px;margin-bottom:22px;line-height:1.5}
 .gate-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-@media (prefers-reduced-motion:reduce){.flagtrack{animation:none}}
 .langopt{display:flex;align-items:center;gap:10px;justify-content:flex-start;
   background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 16px;
   color:var(--ink);font-size:15px;font-weight:550;cursor:pointer;transition:.15s;font-family:inherit}
@@ -118,29 +116,25 @@ h2{font-size:clamp(30px,5.5vw,48px);line-height:1.08;margin:0 0 20px;font-weight
     <div class="globe">🌍</div>
     <div class="gate-t">Choose your language</div>
     <div class="gate-s">Доступно по всему миру · Available worldwide · متاح في كل مكان · 全球可用</div>
-    <div class="flagbar"><div class="flagtrack">
-      <span>🇬🇧</span><span>🇷🇺</span><span>🇪🇸</span><span>🇧🇷</span><span>🇹🇷</span><span>🇨🇳</span><span>🇸🇦</span><span>🇫🇷</span><span>🇩🇪</span><span>🇮🇹</span><span>🇺🇦</span><span>🇵🇱</span><span>🇮🇩</span><span>🇮🇳</span><span>🇯🇵</span><span>🇰🇷</span><span>🇻🇳</span><span>🇮🇷</span><span>🇺🇸</span><span>🇲🇽</span><span>🇦🇪</span><span>🇳🇬</span><span>🇵🇭</span><span>🇹🇭</span><span>🇰🇿</span><span>🇪🇬</span>
-      <span>🇬🇧</span><span>🇷🇺</span><span>🇪🇸</span><span>🇧🇷</span><span>🇹🇷</span><span>🇨🇳</span><span>🇸🇦</span><span>🇫🇷</span><span>🇩🇪</span><span>🇮🇹</span><span>🇺🇦</span><span>🇵🇱</span><span>🇮🇩</span><span>🇮🇳</span><span>🇯🇵</span><span>🇰🇷</span><span>🇻🇳</span><span>🇮🇷</span><span>🇺🇸</span><span>🇲🇽</span><span>🇦🇪</span><span>🇳🇬</span><span>🇵🇭</span><span>🇹🇭</span><span>🇰🇿</span><span>🇪🇬</span>
-    </div></div>
     <div class="gate-grid">
-      <button class="langopt" data-lang="en"><span class="fl">🇬🇧</span>English</button>
-      <button class="langopt" data-lang="ru"><span class="fl">🇷🇺</span>Русский</button>
-      <button class="langopt" data-lang="es"><span class="fl">🇪🇸</span>Español</button>
-      <button class="langopt" data-lang="pt"><span class="fl">🇧🇷</span>Português</button>
-      <button class="langopt" data-lang="fr"><span class="fl">🇫🇷</span>Français</button>
-      <button class="langopt" data-lang="de"><span class="fl">🇩🇪</span>Deutsch</button>
-      <button class="langopt" data-lang="it"><span class="fl">🇮🇹</span>Italiano</button>
-      <button class="langopt" data-lang="tr"><span class="fl">🇹🇷</span>Türkçe</button>
-      <button class="langopt" data-lang="uk"><span class="fl">🇺🇦</span>Українська</button>
-      <button class="langopt" data-lang="pl"><span class="fl">🇵🇱</span>Polski</button>
-      <button class="langopt" data-lang="id"><span class="fl">🇮🇩</span>Indonesia</button>
-      <button class="langopt" data-lang="vi"><span class="fl">🇻🇳</span>Tiếng Việt</button>
-      <button class="langopt" data-lang="hi"><span class="fl">🇮🇳</span>हिन्दी</button>
-      <button class="langopt" data-lang="zh"><span class="fl">🇨🇳</span>中文</button>
-      <button class="langopt" data-lang="ja"><span class="fl">🇯🇵</span>日本語</button>
-      <button class="langopt" data-lang="ko"><span class="fl">🇰🇷</span>한국어</button>
-      <button class="langopt" data-lang="ar"><span class="fl">🇸🇦</span>العربية</button>
-      <button class="langopt" data-lang="fa"><span class="fl">🇮🇷</span>فارسی</button>
+      <button class="langopt" data-lang="en"><span class="fl fi fi-gb"></span>English</button>
+      <button class="langopt" data-lang="ru"><span class="fl fi fi-ru"></span>Русский</button>
+      <button class="langopt" data-lang="es"><span class="fl fi fi-es"></span>Español</button>
+      <button class="langopt" data-lang="pt"><span class="fl fi fi-br"></span>Português</button>
+      <button class="langopt" data-lang="fr"><span class="fl fi fi-fr"></span>Français</button>
+      <button class="langopt" data-lang="de"><span class="fl fi fi-de"></span>Deutsch</button>
+      <button class="langopt" data-lang="it"><span class="fl fi fi-it"></span>Italiano</button>
+      <button class="langopt" data-lang="tr"><span class="fl fi fi-tr"></span>Türkçe</button>
+      <button class="langopt" data-lang="uk"><span class="fl fi fi-ua"></span>Українська</button>
+      <button class="langopt" data-lang="pl"><span class="fl fi fi-pl"></span>Polski</button>
+      <button class="langopt" data-lang="id"><span class="fl fi fi-id"></span>Indonesia</button>
+      <button class="langopt" data-lang="vi"><span class="fl fi fi-vn"></span>Tiếng Việt</button>
+      <button class="langopt" data-lang="hi"><span class="fl fi fi-in"></span>हिन्दी</button>
+      <button class="langopt" data-lang="zh"><span class="fl fi fi-cn"></span>中文</button>
+      <button class="langopt" data-lang="ja"><span class="fl fi fi-jp"></span>日本語</button>
+      <button class="langopt" data-lang="ko"><span class="fl fi fi-kr"></span>한국어</button>
+      <button class="langopt" data-lang="ar"><span class="fl fi fi-sa"></span>العربية</button>
+      <button class="langopt" data-lang="fa"><span class="fl fi fi-ir"></span>فارسی</button>
     </div>
   </div>
 </div>
@@ -567,7 +561,7 @@ const I18N={
   join_lede:"بعد از آن خودش کار می‌کند. آماده‌ای؟ به اپراتوری که این لینک را برایت فرستاده پیام بده.",
   note:"سود را طبق توافق تقسیم می‌کنیم: از روی سابقهٔ هر معامله، شفاف محاسبه می‌شود. حساب و پولت همیشه مال خودت است."}
 };
-const FLAG={en:'🇬🇧',ru:'🇷🇺',es:'🇪🇸',pt:'🇧🇷',fr:'🇫🇷',de:'🇩🇪',it:'🇮🇹',tr:'🇹🇷',uk:'🇺🇦',pl:'🇵🇱',id:'🇮🇩',vi:'🇻🇳',hi:'🇮🇳',zh:'🇨🇳',ja:'🇯🇵',ko:'🇰🇷',ar:'🇸🇦',fa:'🇮🇷'};
+const FLAG={en:'gb',ru:'ru',es:'es',pt:'br',fr:'fr',de:'de',it:'it',tr:'tr',uk:'ua',pl:'pl',id:'id',vi:'vn',hi:'in',zh:'cn',ja:'jp',ko:'kr',ar:'sa',fa:'ir'};
 const RTL=['ar','fa'];
 function applyLang(code){
   const d=I18N[code]||I18N.en;
@@ -575,7 +569,7 @@ function applyLang(code){
   document.documentElement.dir=RTL.includes(code)?'rtl':'ltr';
   document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');if(d[k]!=null)el.textContent=d[k];});
   document.getElementById('langlabel').textContent=d.name;
-  document.getElementById('langflag').textContent=FLAG[code]||'🌐';
+  const lf=document.getElementById('langflag');lf.textContent='';lf.className='fi fi-'+(FLAG[code]||'gb');
   try{localStorage.setItem('flip_lang',code);}catch(e){}
 }
 function openGate(){document.getElementById('gate').classList.remove('hide');document.body.style.overflow='hidden';}

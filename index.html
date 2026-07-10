@@ -99,10 +99,17 @@ h2{font-size:clamp(30px,5.5vw,48px);line-height:1.08;margin:0 0 20px;font-weight
   border-radius:999px;padding:8px 15px}
 .note{color:var(--dim);font-size:13px;max-width:52ch;margin:14px auto 0;line-height:1.55}
 
-/* reveal */
-.rise{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1)}
-.rise.in{opacity:1;transform:none}
-@media (prefers-reduced-motion:reduce){.rise{opacity:1;transform:none;transition:none}.scroll .ln,.globe{animation:none}}
+/* 3D reveal on scroll */
+.rise{opacity:0;transform:perspective(1000px) rotateX(16deg) translateY(40px);transform-origin:center top;
+  transition:opacity .8s ease,transform .95s cubic-bezier(.16,.84,.24,1)}
+.rise.in{opacity:1;transform:perspective(1000px) rotateX(0) translateY(0)}
+.cards,.rows{perspective:1100px}
+.card,.row{transition:transform .35s cubic-bezier(.2,.7,.2,1),border-color .35s}
+.card:hover{transform:rotateX(4deg) rotateY(-5deg) translateY(-4px);border-color:var(--cyan-dim)}
+.row:hover{transform:translateX(4px);border-color:var(--cyan-dim)}
+[dir="rtl"] .row:hover{transform:translateX(-4px)}
+@media (prefers-reduced-motion:reduce){.rise{opacity:1;transform:none;transition:none}
+  .card:hover,.row:hover{transform:none}.scroll .ln,.globe{animation:none}}
 @media (max-width:620px){.cards{grid-template-columns:1fr}section{padding:80px 0}}
 </style>
 

@@ -81,6 +81,24 @@ h2{font-size:clamp(30px,5.5vw,48px);line-height:1.08;margin:0 0 20px;font-weight
 @keyframes swing{0%,100%{transform:rotate(-14deg)}50%{transform:rotate(14deg)}}
 .confetti{position:fixed;z-index:35;pointer-events:none;will-change:transform,opacity;
   filter:drop-shadow(0 2px 4px rgba(0,0,0,.4))}
+/* ---- per-country bespoke scene engine (plays in margins, never over the reading column) ---- */
+#fx{position:fixed;inset:0;z-index:40;pointer-events:none;overflow:hidden}
+#fx *{position:absolute}
+.eiffel{right:5vw;bottom:7vh;width:74px;transform-origin:bottom center;opacity:0;filter:drop-shadow(0 4px 6px rgba(0,0,0,.45))}
+.eiffel.go{animation:eifTopple 2.6s cubic-bezier(.5,0,.9,1) forwards}
+@keyframes eifTopple{0%{opacity:0;transform:rotate(0)}12%{opacity:1;transform:rotate(0)}55%{transform:rotate(6deg)}100%{opacity:1;transform:rotate(83deg)}}
+.wine{right:2vw;bottom:6vh;width:0;height:0;border-radius:50%;background:radial-gradient(closest-side,#7d1330 55%,rgba(125,19,48,0));transform:translate(20px,10px)}
+.wine.go{animation:wineSpill 1.1s ease-out 2.15s forwards}
+@keyframes wineSpill{from{width:0;height:0;opacity:.9}to{width:200px;height:82px;opacity:.8}}
+.crack{right:6vw;bottom:8.5vh;font-size:30px;opacity:0}
+.crack.go{animation:crackPop .55s steps(3) 2.05s forwards}
+@keyframes crackPop{0%{opacity:0;transform:scale(.4)}45%{opacity:1;transform:scale(1.15)}100%{opacity:0}}
+.bearRun{bottom:3vh;left:0;animation:bearAcross 4.2s linear forwards}
+.bearRun .bob{animation:bearBob .46s ease-in-out infinite;transform-origin:center bottom}
+@keyframes bearAcross{0%{transform:translateX(-180px)}100%{transform:translateX(107vw)}}
+@keyframes bearBob{0%,100%{transform:translateY(0) rotate(-2.5deg)}50%{transform:translateY(-12px) rotate(2.5deg)}}
+.snow{border-radius:50%;background:#fff}
+@keyframes snowFall{to{transform:translateY(103vh);opacity:0}}
 #hero .wrap{position:relative;z-index:2}
 #hero::after{content:"";position:absolute;inset:0;z-index:1;
   background:radial-gradient(120% 90% at 50% 40%,transparent 40%,var(--bg) 92%)}
@@ -165,6 +183,7 @@ h2{font-size:clamp(30px,5.5vw,48px);line-height:1.08;margin:0 0 20px;font-weight
 
 <div id="flyflag"></div>
 <canvas id="flycanvas"></canvas>
+<div id="fx" aria-hidden="true"></div>
 <button id="langbtn"><span id="langflag">🌐</span> <span id="langlabel">English</span></button>
 
 <section id="hero">
@@ -662,7 +681,29 @@ function confettiBurst(x,y){
     (function f(){ t++; vy+=0.42; s.style.transform='translate('+(vx*t).toFixed(0)+'px,'+((vy*t)+0.21*t*t).toFixed(0)+'px)';
       s.style.opacity=Math.max(0,1-t/48); if(t<48)requestAnimationFrame(f); else s.remove(); })(); }
 }
-// per-country interactive layer will be rebuilt bespoke (Eiffel falls, bear runs across, etc.)
+// ---- bespoke per-country scene engine (plays in the margins after the flag reveal) ----
+function playFrance(fx){
+  fx.innerHTML='<div class="wine"></div><div class="crack">💥</div>'+
+    '<svg class="eiffel" viewBox="0 0 40 100"><path d="M20 2 L24 26 L30 64 L38 100 L27 100 L23 76 L17 76 L13 100 L2 100 L10 64 L16 26 Z" fill="#b6923f"/>'+
+    '<rect x="8" y="58" width="24" height="4" fill="#b6923f"/><rect x="11" y="34" width="18" height="3" fill="#b6923f"/><rect x="18.4" y="2" width="3.2" height="12" fill="#b6923f"/></svg>';
+  requestAnimationFrame(()=>fx.querySelectorAll('.eiffel,.wine,.crack').forEach(e=>e.classList.add('go')));
+}
+function playRussia(fx){
+  fx.innerHTML='<div class="bearRun"><div class="bob"><svg viewBox="0 0 150 92" width="142" style="filter:drop-shadow(0 5px 7px rgba(0,0,0,.5))">'+
+    '<g fill="#6b4a2b"><ellipse cx="64" cy="54" rx="48" ry="29"/><circle cx="110" cy="42" r="23"/><circle cx="101" cy="23" r="8"/><circle cx="120" cy="23" r="8"/>'+
+    '<ellipse cx="127" cy="46" rx="9" ry="7" fill="#4a3319"/><rect x="26" y="72" width="15" height="19" rx="7"/><rect x="52" y="72" width="15" height="19" rx="7"/><rect x="80" y="72" width="15" height="19" rx="7"/></g>'+
+    '<circle cx="116" cy="37" r="2.8" fill="#160d06"/><circle cx="131" cy="47" r="2.4" fill="#160d06"/></svg></div></div>';
+  for(let i=0;i<20;i++){ const s=document.createElement('div'); s.className='snow'; const sz=(3+Math.random()*4).toFixed(1);
+    s.style.cssText='width:'+sz+'px;height:'+sz+'px;left:'+(Math.random()*100).toFixed(1)+'%;top:-12px;opacity:.7;'+
+      'animation:snowFall '+(4+Math.random()*4).toFixed(1)+'s linear '+(Math.random()*3).toFixed(1)+'s forwards';
+    fx.appendChild(s); }
+}
+const SCENES={fr:playFrance,ru:playRussia};
+function playScene(code){
+  const fx=document.getElementById('fx'); if(!fx)return; fx.innerHTML='';
+  if(matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+  const f=SCENES[code]; if(f){ f(fx); setTimeout(()=>{fx.innerHTML='';},5200); }
+}
 function applyLang(code){
   const d=I18N[code]||I18N.en;
   document.documentElement.lang=code;
@@ -704,7 +745,7 @@ function flyFlag(iso,done){
   dbg('flyFlag iso='+iso+' dataLen='+((FLAGDATA[iso]||'').length));
   const img=new Image();
   img.onload=()=>{
-    const nw=img.naturalWidth||640, nh=img.naturalHeight||480, SC=Math.max(2,Math.min(3,1920/nw));
+    const nw=img.naturalWidth||640, nh=img.naturalHeight||480, SC=2048/nw;   // high-res raster -> crisp (fixes the pixelation)
     const oc=document.createElement('canvas'); oc.width=Math.round(nw*SC); oc.height=Math.round(nh*SC);
     const octx=oc.getContext('2d'); octx.imageSmoothingEnabled=true; octx.imageSmoothingQuality='high';
     octx.drawImage(img,0,0,oc.width,oc.height);   // rasterize the vector flag at high res -> crisp when zoomed
@@ -733,8 +774,9 @@ function runFly3D(oc,done){
     var cnt=geo.attributes.position.count;
     geo.setAttribute('color', new THREE.BufferAttribute(new Float32Array(cnt*3).fill(1),3));
     tex=new THREE.CanvasTexture(oc);
-    tex.minFilter=THREE.LinearFilter; tex.magFilter=THREE.LinearFilter; tex.generateMipmaps=false;   // NPOT-safe + crisp
+    tex.minFilter=THREE.LinearFilter; tex.magFilter=THREE.LinearFilter; tex.generateMipmaps=false;   // NPOT-safe (WebGL1)
     tex.wrapS=tex.wrapT=THREE.ClampToEdgeWrapping;
+    try{ tex.anisotropy=rnd.capabilities.getMaxAnisotropy(); }catch(_){}   // sharp on the angled folds
     if(THREE.sRGBEncoding) tex.encoding=THREE.sRGBEncoding;
     tex.needsUpdate=true;
     // self-lit material (no lights/normals to fail) + per-vertex shading for the folds
@@ -798,7 +840,7 @@ document.querySelectorAll('.langopt').forEach(b=>b.onclick=()=>{
   applyLang(code);
   window.scrollTo(0,0);                        // start every language swap from the top (hidden by the flag)
   const gate=document.getElementById('gate');
-  const fin=()=>{ window.scrollTo(0,0); closeGate(); gate.style.opacity=''; gate.style.transition=''; };
+  const fin=()=>{ window.scrollTo(0,0); closeGate(); gate.style.opacity=''; gate.style.transition=''; playScene(code); };
   gate.style.transition='opacity .4s ease'; gate.style.opacity='0';
   flyFlag(iso,fin);                            // always show the flag (even if the OS has "reduce motion" on)
 });

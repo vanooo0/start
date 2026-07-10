@@ -22,6 +22,16 @@ body{margin:0;background:var(--bg);color:var(--ink);
 #gate{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:24px;
   background:radial-gradient(120% 90% at 50% 30%,#0c1a22,#04060a 85%)}
 #gate.hide{display:none}
+#flyflag{position:fixed;inset:0;z-index:60;background-size:cover;background-position:center;
+  opacity:0;pointer-events:none;will-change:transform,opacity}
+#flyflag::after{content:"";position:absolute;inset:0;box-shadow:inset 0 0 220px 60px rgba(0,0,0,.55)}
+#flyflag.go{animation:flyin 1.15s cubic-bezier(.45,0,.25,1) forwards}
+@keyframes flyin{
+  0%{opacity:0;transform:perspective(1300px) translateZ(-1000px) scale(.22) rotateX(20deg)}
+  22%{opacity:1}
+  62%{opacity:1;transform:perspective(1300px) translateZ(0) scale(1) rotateX(0)}
+  100%{opacity:0;transform:perspective(1300px) translateZ(600px) scale(2.4) rotateX(-8deg)}
+}
 .gate-card{max-width:440px;width:100%;text-align:center}
 .globe{font-size:46px;margin-bottom:14px;animation:spin 14s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -139,6 +149,7 @@ h2{font-size:clamp(30px,5.5vw,48px);line-height:1.08;margin:0 0 20px;font-weight
   </div>
 </div>
 
+<div id="flyflag"></div>
 <button id="langbtn"><span id="langflag">🌐</span> <span id="langlabel">English</span></button>
 
 <section id="hero">
@@ -574,7 +585,19 @@ function applyLang(code){
 }
 function openGate(){document.getElementById('gate').classList.remove('hide');document.body.style.overflow='hidden';}
 function closeGate(){document.getElementById('gate').classList.add('hide');document.body.style.overflow='';}
-document.querySelectorAll('.langopt').forEach(b=>b.onclick=()=>{applyLang(b.dataset.lang);closeGate();});
+const FLAGCDN='https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/';
+document.querySelectorAll('.langopt').forEach(b=>b.onclick=()=>{
+  const code=b.dataset.lang, iso=FLAG[code]||'gb';
+  applyLang(code);
+  const gate=document.getElementById('gate');
+  if(matchMedia('(prefers-reduced-motion:reduce)').matches){closeGate();return;}
+  const ff=document.getElementById('flyflag');
+  ff.style.backgroundImage="url("+FLAGCDN+iso+".svg)";
+  ff.classList.remove('go'); void ff.offsetWidth; ff.classList.add('go');   // 3D fly-through into the chosen flag
+  gate.style.transition='opacity .45s ease'; gate.style.opacity='0';
+  setTimeout(()=>{ closeGate(); gate.style.opacity=''; gate.style.transition='';
+    ff.classList.remove('go'); ff.style.backgroundImage=''; }, 1120);
+});
 document.getElementById('langbtn').onclick=openGate;
 (function(){
   let saved=null;try{saved=localStorage.getItem('flip_lang');}catch(e){}

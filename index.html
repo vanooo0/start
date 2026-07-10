@@ -99,6 +99,14 @@ h2{font-size:clamp(30px,5.5vw,48px);line-height:1.08;margin:0 0 20px;font-weight
 @keyframes bearBob{0%,100%{transform:translateY(0) rotate(-2.5deg)}50%{transform:translateY(-12px) rotate(2.5deg)}}
 .snow{border-radius:50%;background:#fff}
 @keyframes snowFall{to{transform:translateY(103vh);opacity:0}}
+#fx .p{filter:drop-shadow(0 3px 6px rgba(0,0,0,.4))}
+@keyframes petalFall{0%{opacity:0;transform:translateY(0) rotate(0)}12%{opacity:.92}100%{opacity:0;transform:translateY(114vh) rotate(240deg)}}
+@keyframes runX{from{transform:translateX(-20vw)}to{transform:translateX(120vw)}}
+@keyframes arcX{0%{transform:translate(0,0);opacity:1}50%{transform:translate(50vw,-25vh)}100%{transform:translate(118vw,8vh);opacity:0}}
+@keyframes growPop{to{transform:scale(1)}}
+@keyframes swingDown{from{transform:translateY(-70px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes swayA{0%,100%{transform:rotate(-12deg)}50%{transform:rotate(12deg)}}
+@keyframes balloonUp{0%{opacity:0}10%{opacity:1}100%{transform:translateY(-120vh);opacity:0}}
 #hero .wrap{position:relative;z-index:2}
 #hero::after{content:"";position:absolute;inset:0;z-index:1;
   background:radial-gradient(120% 90% at 50% 40%,transparent 40%,var(--bg) 92%)}
@@ -698,7 +706,35 @@ function playRussia(fx){
       'animation:snowFall '+(4+Math.random()*4).toFixed(1)+'s linear '+(Math.random()*3).toFixed(1)+'s forwards';
     fx.appendChild(s); }
 }
-const SCENES={fr:playFrance,ru:playRussia};
+// scene primitives — choreographed moments in the margins/bottom band, never over the text column
+function mk(fx,txt,css){const d=document.createElement('div');d.className='p';d.textContent=txt;d.style.cssText='position:absolute;'+css;fx.appendChild(d);return d;}
+function drift(fx,ch,n){for(let i=0;i<(n||14);i++)mk(fx,ch,'top:-7vh;left:'+(Math.random()*100).toFixed(1)+'%;font-size:'+(15+Math.random()*18|0)+'px;opacity:0;animation:petalFall '+(5+Math.random()*4).toFixed(1)+'s linear '+(Math.random()*3.5).toFixed(1)+'s forwards');}
+function runX(fx,ch,vh,dur,sz){return mk(fx,ch,'bottom:'+(vh||3)+'vh;left:0;white-space:nowrap;font-size:'+(sz||46)+'px;animation:runX '+(dur||4.4)+'s linear forwards');}
+function arc(fx,ch){return mk(fx,ch,'left:0;top:34%;font-size:42px;animation:arcX 2.3s ease-in forwards');}
+function pop(fx,ch,corner,sz,delay){const p={br:'right:5vw;bottom:8vh',bl:'left:5vw;bottom:8vh',tr:'right:6vw;top:12vh',tl:'left:6vw;top:12vh'}[corner||'br'];
+  return mk(fx,ch,p+';font-size:'+(sz||62)+'px;transform:scale(0);transform-origin:center bottom;animation:growPop .9s cubic-bezier(.2,1.5,.4,1) '+(delay||0.2)+'s forwards');}
+function swing(fx,ch,corner){return mk(fx,ch,(corner==='tl'?'left:8vw':'right:8vw')+';top:0;font-size:46px;transform-origin:top center;animation:swingDown 1s ease-out forwards, swayA 2.6s ease-in-out 1s infinite');}
+function balloon(fx,ch,side){return mk(fx,ch,(side==='l'?'left:8vw':'right:8vw')+';bottom:-8vh;font-size:40px;animation:balloonUp 5.5s ease-in forwards');}
+const SCENES={
+ en:fx=>{runX(fx,'🚌',3,4.6,54); setTimeout(()=>runX(fx,'🐕',3,5,32),750); swing(fx,'☂️','tr');},
+ ru:playRussia,
+ es:fx=>{pop(fx,'💃','br'); arc(fx,'🌹');},
+ pt:fx=>{arc(fx,'⚽'); drift(fx,'🎉',10);},
+ fr:playFrance,
+ de:fx=>{runX(fx,'🍺',3,4,50); pop(fx,'🥨','tr',50);},
+ it:fx=>{pop(fx,'🍕','bl'); runX(fx,'🛵',3,4.2,40);},
+ tr:fx=>{pop(fx,'🌷','br'); balloon(fx,'🎈','l'); pop(fx,'🫖','bl',48,0.6);},
+ uk:fx=>{pop(fx,'🌻','bl'); pop(fx,'🌾','br',56,0.4); pop(fx,'🌾','br',56,0.75);},
+ pl:fx=>{arc(fx,'🕊️'); pop(fx,'🥟','br');},
+ id:fx=>{pop(fx,'🌋','bl'); drift(fx,'🌴',8); arc(fx,'🦋');},
+ vi:fx=>{runX(fx,'🛵',3,4.2,40); pop(fx,'🪷','br'); pop(fx,'🍜','bl',48,0.5);},
+ hi:fx=>{pop(fx,'🦚','br',70); pop(fx,'🪔','bl',46); drift(fx,'🌼',10);},
+ zh:fx=>{runX(fx,'🐉',4,5,64); swing(fx,'🏮','tr');},
+ ja:fx=>{drift(fx,'🌸',18); pop(fx,'⛩️','br',60);},
+ ko:fx=>{pop(fx,'🎎','br'); swing(fx,'🏮','tl'); drift(fx,'✨',8);},
+ ar:fx=>{pop(fx,'🌴','br',74); pop(fx,'☕','bl',46,0.5); pop(fx,'🐪','bl',52,0.9);},
+ fa:fx=>{pop(fx,'🌹','br'); pop(fx,'🐱','bl',54); pop(fx,'🍵','bl',44,0.6);}
+};
 function playScene(code){
   const fx=document.getElementById('fx'); if(!fx)return; fx.innerHTML='';
   if(matchMedia('(prefers-reduced-motion:reduce)').matches) return;

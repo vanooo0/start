@@ -593,19 +593,17 @@ function closeGate(){document.getElementById('gate').classList.add('hide');docum
 const FLAGSVG='https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/';
 function hasWebGL(){try{const c=document.createElement('canvas');return !!(window.THREE&&(c.getContext('webgl')||c.getContext('experimental-webgl')));}catch(e){return false;}}
 
+function loadFlag(iso,cors,ok,fail){        // load as an IMG (same as the working menu flags), no fetch
+  const img=new Image(); if(cors)img.crossOrigin='anonymous';
+  img.onload=()=>{ const oc=document.createElement('canvas'); oc.width=1024; oc.height=768;
+    try{ oc.getContext('2d').drawImage(img,0,0,1024,768); ok(oc); }catch(e){ fail(); } };
+  img.onerror=fail; img.src=FLAGSVG+iso+'.svg';
+}
 function flyFlag(iso,done){
-  fetch(FLAGSVG+iso+'.svg').then(r=>r.text()).then(txt=>{
-    txt=txt.replace('<svg ','<svg width="640" height="480" ');
-    const url=URL.createObjectURL(new Blob([txt],{type:'image/svg+xml'}));
-    const img=new Image();
-    img.onload=()=>{
-      const oc=document.createElement('canvas'); oc.width=1024; oc.height=768;
-      oc.getContext('2d').drawImage(img,0,0,1024,768); URL.revokeObjectURL(url);
-      (hasWebGL()?runFly3D:runFly2D)(oc,done);
-    };
-    img.onerror=()=>{URL.revokeObjectURL(url);done&&done();};
-    img.src=url;
-  }).catch(()=>done&&done());
+  // 1st try: CORS-clean image -> enables the WebGL 3D flag. If that can't load, fall back to a
+  // plain image (works even with privacy blockers) and the 2D waving flag.
+  loadFlag(iso,true, oc=>(hasWebGL()?runFly3D:runFly2D)(oc,done),
+           ()=> loadFlag(iso,false, oc=>runFly2D(oc,done), ()=>done&&done()));
 }
 function runFly3D(oc,done){
   const cv=document.getElementById('flycanvas'); cv.style.display='block'; cv.style.opacity='1';

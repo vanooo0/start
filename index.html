@@ -100,6 +100,18 @@ h2{font-size:clamp(30px,5.5vw,48px);line-height:1.08;margin:0 0 20px;font-weight
   background:radial-gradient(closest-side,#7d1330 62%,rgba(125,19,48,.25) 88%,rgba(125,19,48,0));transform:translate(26px,8px)}
 .wine.go{animation:wineSpill 1.5s cubic-bezier(.3,1.25,.5,1) 2.5s forwards}
 @keyframes wineSpill{0%{width:0;height:0;opacity:.95}72%{width:220px;height:80px;opacity:.86}100%{width:204px;height:76px;opacity:.82}}
+/* UK — bus drives across, corgi trots behind */
+.bob2{animation:driveBob .42s ease-in-out infinite;transform-origin:center bottom}
+@keyframes driveBob{0%,100%{transform:translateY(0) rotate(-.5deg)}50%{transform:translateY(-3px) rotate(.5deg)}}
+/* Germany — stein slides in, clinks, bubbles rise */
+@keyframes steinIn{0%{transform:translateX(160px);opacity:0}60%{opacity:1}100%{transform:translateX(0)}}
+@keyframes steinClink{0%,100%{transform:rotate(0)}50%{transform:rotate(-11deg)}}
+.bub{border-radius:50%;background:rgba(255,255,255,.92)}
+@keyframes bubUp{0%{opacity:0;transform:translateY(0) scale(.6)}25%{opacity:.9}100%{opacity:0;transform:translateY(-70px) scale(1)}}
+/* Japan — sakura drifts, torii rises */
+@keyframes petalDrift{0%{opacity:0;transform:translateY(0) translateX(0) rotate(0)}10%{opacity:.95}
+  50%{transform:translateY(56vh) translateX(30px) rotate(200deg)}100%{opacity:0;transform:translateY(116vh) translateX(-30px) rotate(420deg)}}
+@keyframes toriiIn{0%{opacity:0;transform:translateY(26px) scale(.9)}100%{opacity:1;transform:translateY(0) scale(1)}}
 .bearRun{bottom:3vh;left:0;animation:bearAcross 4.2s linear forwards}
 .bearRun .bob{animation:bearBob .46s ease-in-out infinite;transform-origin:center bottom}
 @keyframes bearAcross{0%{transform:translateX(-180px)}100%{transform:translateX(107vw)}}
@@ -720,6 +732,12 @@ function playRussia(fx){
 }
 // scene primitives — choreographed moments in the margins/bottom band, never over the text column
 function mk(fx,txt,css){const d=document.createElement('div');d.className='p';d.textContent=txt;d.style.cssText='position:absolute;'+css;fx.appendChild(d);return d;}
+function mkH(fx,html,css){const d=document.createElement('div');d.className='p';d.style.cssText='position:absolute;'+css;d.innerHTML=html;fx.appendChild(d);return d;}
+const SVG_BUS='<svg width="118" height="66" viewBox="0 0 118 66"><rect x="3" y="8" width="112" height="44" rx="7" fill="#d62b1f"/><rect x="3" y="29" width="112" height="2.5" fill="#9c1a12"/><g fill="#cdeaf6"><rect x="10" y="12" width="15" height="12" rx="2"/><rect x="31" y="12" width="15" height="12" rx="2"/><rect x="52" y="12" width="15" height="12" rx="2"/><rect x="73" y="12" width="15" height="12" rx="2"/><rect x="94" y="12" width="15" height="12" rx="2"/><rect x="10" y="35" width="15" height="12" rx="2"/><rect x="31" y="35" width="15" height="12" rx="2"/><rect x="52" y="35" width="15" height="12" rx="2"/></g><rect x="96" y="34" width="14" height="18" rx="2" fill="#9c1a12"/><circle cx="30" cy="55" r="9" fill="#1a1a1a"/><circle cx="90" cy="55" r="9" fill="#1a1a1a"/><circle cx="30" cy="55" r="3.5" fill="#888"/><circle cx="90" cy="55" r="3.5" fill="#888"/></svg>';
+const SVG_CORGI='<svg width="56" height="38" viewBox="0 0 62 42"><ellipse cx="28" cy="24" rx="22" ry="11" fill="#e59b3f"/><rect x="24" y="22" width="15" height="9" rx="3" fill="#fff"/><circle cx="50" cy="17" r="10" fill="#e59b3f"/><path d="M45 6l4 9-8 0z" fill="#e59b3f"/><path d="M55 6l4 9-8 0z" fill="#e59b3f"/><rect x="14" y="30" width="5" height="9" rx="2.5" fill="#c47f2b"/><rect x="26" y="30" width="5" height="9" rx="2.5" fill="#c47f2b"/><rect x="37" y="30" width="5" height="9" rx="2.5" fill="#c47f2b"/><circle cx="57" cy="18" r="2.4" fill="#2a1a0a"/><circle cx="52" cy="14" r="1.6" fill="#2a1a0a"/></svg>';
+const SVG_STEIN='<svg width="72" height="88" viewBox="0 0 72 88"><path d="M52 34h9a8 8 0 0 1 8 8v9a8 8 0 0 1-8 8h-9" fill="none" stroke="#d9a92f" stroke-width="6"/><rect x="12" y="26" width="40" height="56" rx="6" fill="#f4c542" stroke="#d29a25" stroke-width="2"/><rect x="19" y="40" width="4" height="34" rx="2" fill="#ffe08a" opacity=".7"/><g fill="#fff"><circle cx="18" cy="24" r="9"/><circle cx="31" cy="18" r="12"/><circle cx="45" cy="24" r="9"/><rect x="12" y="20" width="40" height="10" rx="4"/></g></svg>';
+const SVG_TORII='<svg width="96" height="82" viewBox="0 0 96 82"><path d="M4 12 Q48 2 92 12 L92 20 Q48 12 4 20 Z" fill="#c62828"/><rect x="16" y="26" width="64" height="7" fill="#c62828"/><rect x="20" y="18" width="9" height="60" fill="#c62828"/><rect x="67" y="18" width="9" height="60" fill="#c62828"/><rect x="14" y="12" width="17" height="8" fill="#9c1c1c"/><rect x="65" y="12" width="17" height="8" fill="#9c1c1c"/></svg>';
+const SVG_PETAL='<svg width="16" height="16" viewBox="0 0 16 16"><path d="M8 1C6 3 3 4 3 8c0 3 3 6 5 7 2-1 5-4 5-7 0-4-3-5-5-7z" fill="#ffb7c5"/><path d="M8 3c-1 2-3 3-3 5" stroke="#ff9bb0" stroke-width="1" fill="none"/></svg>';
 function drift(fx,ch,n){for(let i=0;i<(n||14);i++)mk(fx,ch,'top:-7vh;left:'+(Math.random()*100).toFixed(1)+'%;font-size:'+(15+Math.random()*18|0)+'px;opacity:0;animation:petalFall '+(5+Math.random()*4).toFixed(1)+'s linear '+(Math.random()*3.5).toFixed(1)+'s forwards');}
 function runX(fx,ch,vh,dur,sz){return mk(fx,ch,'bottom:'+(vh||3)+'vh;left:0;white-space:nowrap;font-size:'+(sz||46)+'px;animation:runX '+(dur||4.4)+'s linear forwards');}
 function arc(fx,ch){return mk(fx,ch,'left:0;top:34%;font-size:42px;animation:arcX 2.3s ease-in forwards');}
@@ -728,12 +746,15 @@ function pop(fx,ch,corner,sz,delay){const p={br:'right:5vw;bottom:8vh',bl:'left:
 function swing(fx,ch,corner){return mk(fx,ch,(corner==='tl'?'left:8vw':'right:8vw')+';top:0;font-size:46px;transform-origin:top center;animation:swingDown 1s ease-out forwards, swayA 2.6s ease-in-out 1s infinite');}
 function balloon(fx,ch,side){return mk(fx,ch,(side==='l'?'left:8vw':'right:8vw')+';bottom:-8vh;font-size:40px;animation:balloonUp 5.5s ease-in forwards');}
 const SCENES={
- en:fx=>{runX(fx,'🚌',3,4.6,54); setTimeout(()=>runX(fx,'🐕',3,5,32),750); swing(fx,'☂️','tr');},
+ en:fx=>{ mkH(fx,'<div class="bob2">'+SVG_BUS+'</div>','bottom:2vh;left:0;animation:runX 4.8s linear forwards');
+   mkH(fx,'<div class="bob2">'+SVG_CORGI+'</div>','bottom:2vh;left:0;animation:runX 5.6s linear .6s forwards'); },
  ru:playRussia,
  es:fx=>{pop(fx,'💃','br'); arc(fx,'🌹');},
  pt:fx=>{arc(fx,'⚽'); drift(fx,'🎉',10);},
  fr:playFrance,
- de:fx=>{runX(fx,'🍺',3,4,50); pop(fx,'🥨','tr',50);},
+ de:fx=>{ mkH(fx,SVG_STEIN,'right:7vw;bottom:6vh;transform-origin:bottom center;animation:steinIn 1.1s cubic-bezier(.3,1.3,.5,1) forwards, steinClink 1.1s ease-in-out 1.4s 2');
+   for(let i=0;i<11;i++){ setTimeout(()=>{ const s=(5+Math.random()*6|0); mk(fx,'','right:'+(8.5+Math.random()*5).toFixed(1)+'vw;bottom:15vh;width:'+s+'px;height:'+s+'px;animation:bubUp '+(1.2+Math.random()).toFixed(1)+'s ease-out forwards').className='p bub'; },1300+i*150); }
+   pop(fx,'🥨','tr',54); },
  it:fx=>{pop(fx,'🍕','bl'); runX(fx,'🛵',3,4.2,40);},
  tr:fx=>{pop(fx,'🌷','br'); balloon(fx,'🎈','l'); pop(fx,'🫖','bl',48,0.6);},
  uk:fx=>{pop(fx,'🌻','bl'); pop(fx,'🌾','br',56,0.4); pop(fx,'🌾','br',56,0.75);},
@@ -742,7 +763,8 @@ const SCENES={
  vi:fx=>{runX(fx,'🛵',3,4.2,40); pop(fx,'🪷','br'); pop(fx,'🍜','bl',48,0.5);},
  hi:fx=>{pop(fx,'🦚','br',70); pop(fx,'🪔','bl',46); drift(fx,'🌼',10);},
  zh:fx=>{runX(fx,'🐉',4,5,64); swing(fx,'🏮','tr');},
- ja:fx=>{drift(fx,'🌸',18); pop(fx,'⛩️','br',60);},
+ ja:fx=>{ for(let i=0;i<16;i++) mkH(fx,SVG_PETAL,'top:-6vh;left:'+(Math.random()*100).toFixed(1)+'%;width:'+(12+Math.random()*8|0)+'px;animation:petalDrift '+(6+Math.random()*4).toFixed(1)+'s linear '+(Math.random()*4).toFixed(1)+'s forwards');
+   mkH(fx,SVG_TORII,'right:6vw;bottom:7vh;animation:toriiIn 1.2s ease-out .3s forwards'); },
  ko:fx=>{pop(fx,'🎎','br'); swing(fx,'🏮','tl'); drift(fx,'✨',8);},
  ar:fx=>{pop(fx,'🌴','br',74); pop(fx,'☕','bl',46,0.5); pop(fx,'🐪','bl',52,0.9);},
  fa:fx=>{pop(fx,'🌹','br'); pop(fx,'🐱','bl',54); pop(fx,'🍵','bl',44,0.6);}

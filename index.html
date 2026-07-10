@@ -1,0 +1,228 @@
+<title>Flip — твой аккаунт работает сам</title>
+<style>
+:root{
+  --bg:#070a10; --bg2:#0b1018; --ink:#eaf1f7; --soft:#9db0c0; --dim:#5f7383;
+  --line:#18222e; --card:#0e151f;
+  --cyan:#3ce0d0; --cyan-dim:#155650; --amber:#f2b43e; --amber-dim:#4a3512;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,sans-serif;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden}
+.mono{font-family:ui-monospace,"SF Mono","JetBrains Mono",Consolas,monospace}
+.wrap{max-width:760px;margin:0 auto;padding:0 24px}
+
+/* ---- shared section rhythm ---- */
+section{position:relative;min-height:100vh;display:flex;align-items:center;padding:96px 0}
+.eyebrow{font-family:ui-monospace,monospace;font-size:12px;letter-spacing:4px;text-transform:uppercase;
+  color:var(--cyan);margin-bottom:22px}
+h1{font-size:clamp(40px,8.5vw,76px);line-height:1.02;margin:0;font-weight:800;letter-spacing:-1.5px;text-wrap:balance}
+h2{font-size:clamp(30px,5.5vw,48px);line-height:1.08;margin:0 0 20px;font-weight:750;letter-spacing:-.8px;text-wrap:balance}
+.lede{color:var(--soft);font-size:clamp(17px,2.4vw,21px);max-width:46ch;margin:26px 0 0;text-wrap:balance}
+.grad{background:linear-gradient(100deg,var(--cyan),#9fe9ff 40%,var(--amber));
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* ---- hero ---- */
+#hero{overflow:hidden}
+#gl{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:0}
+#hero .wrap{position:relative;z-index:2}
+#hero::after{content:"";position:absolute;inset:0;z-index:1;
+  background:radial-gradient(120% 90% at 50% 40%,transparent 40%,var(--bg) 92%)}
+.badge{display:inline-flex;align-items:center;gap:9px;border:1px solid var(--line);
+  background:rgba(10,16,24,.6);backdrop-filter:blur(6px);border-radius:999px;padding:7px 15px;
+  font-size:13px;color:var(--soft);margin-bottom:30px}
+.badge .d{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+.scroll{position:absolute;bottom:34px;left:50%;transform:translateX(-50%);z-index:2;
+  color:var(--dim);font-size:12px;letter-spacing:2px;text-transform:uppercase;display:flex;
+  flex-direction:column;align-items:center;gap:10px}
+.scroll .ln{width:1px;height:36px;background:linear-gradient(var(--cyan),transparent);animation:drop 1.9s ease-in-out infinite}
+@keyframes drop{0%,100%{opacity:.3;transform:scaleY(.5);transform-origin:top}50%{opacity:1;transform:scaleY(1)}}
+
+/* ---- cards ---- */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:40px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px}
+.card .cv{height:56px;margin-bottom:16px}
+.card h3{margin:0 0 7px;font-size:17px;font-weight:650}
+.card p{margin:0;color:var(--soft);font-size:14.5px;line-height:1.5}
+
+/* ---- trust rows ---- */
+.rows{display:grid;gap:2px;margin-top:34px;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.row{display:grid;grid-template-columns:auto 1fr;gap:18px;padding:20px 22px;background:var(--card);align-items:start}
+.row .m{width:34px;height:34px;border-radius:10px;background:var(--cyan-dim);color:var(--cyan);
+  display:grid;place-items:center;font-size:16px;flex:none}
+.row h3{margin:2px 0 5px;font-size:16.5px;font-weight:650}
+.row p{margin:0;color:var(--soft);font-size:14.5px;line-height:1.5}
+.blackbox{margin-top:16px;border:1px dashed var(--amber-dim);background:linear-gradient(180deg,rgba(242,180,62,.05),transparent);
+  border-radius:16px;padding:22px}
+.blackbox .k{font-family:ui-monospace,monospace;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--amber);margin-bottom:10px}
+.blackbox p{margin:0;color:var(--soft);font-size:15.5px}
+
+/* ---- closing ---- */
+#join .box{border:1px solid var(--line);border-radius:22px;padding:46px 34px;text-align:center;
+  background:radial-gradient(90% 120% at 50% 0%,rgba(60,224,208,.08),var(--card))}
+.step-mini{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:26px 0 30px}
+.step-mini span{font-size:13.5px;color:var(--soft);background:var(--bg2);border:1px solid var(--line);
+  border-radius:999px;padding:8px 15px}
+.share{color:var(--dim);font-size:13.5px;margin-top:22px}
+.note{color:var(--dim);font-size:13px;max-width:52ch;margin:14px auto 0;line-height:1.55}
+
+/* reveal */
+.rise{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1)}
+.rise.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.rise{opacity:1;transform:none;transition:none}.scroll .ln{animation:none}}
+@media (max-width:620px){.cards{grid-template-columns:1fr}section{padding:80px 0}}
+</style>
+
+<section id="hero">
+  <canvas id="gl"></canvas>
+  <div class="wrap">
+    <div class="badge"><span class="d"></span>MEXC · пары без комиссии</div>
+    <h1>Твой аккаунт <span class="grad">работает сам</span></h1>
+    <p class="lede">Подключаешь свой аккаунт за три минуты. Дальше он торгует без тебя — а ты в любой момент видишь, сколько заработал.</p>
+  </div>
+  <div class="scroll"><span>листай</span><span class="ln"></span></div>
+</section>
+
+<section id="what">
+  <div class="wrap">
+    <div class="eyebrow rise">в курс дела</div>
+    <h2 class="rise">Откуда вообще берётся профит</h2>
+    <p class="lede rise">Цена на бирже иногда чуть отстаёт от справедливой — на доли секунды. Наш движок ловит этот момент и заходит на догон. А на этих парах нет комиссии, поэтому даже крошечный догон уходит в плюс.</p>
+    <div class="cards">
+      <div class="card rise">
+        <canvas class="cv" data-viz="gap"></canvas>
+        <h3>Отставание</h3>
+        <p>Момент, когда биржа не успела за честной ценой. Это и есть наша добыча.</p>
+      </div>
+      <div class="card rise">
+        <canvas class="cv" data-viz="zero"></canvas>
+        <h3>Ноль комиссии</h3>
+        <p>На выбранных парах биржа не берёт сбор. Весь догон остаётся тебе.</p>
+      </div>
+      <div class="card rise">
+        <canvas class="cv" data-viz="fast"></canvas>
+        <h3>Секундные входы</h3>
+        <p>Сделка живёт секунды. Зашли, забрали догон, вышли — и снова ждём момент.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <div class="eyebrow rise">как это устроено</div>
+    <h2 class="rise">Ты держишь ключи. Мы держим движок.</h2>
+    <p class="lede rise">Никакого доступа к твоим деньгам мы не получаем. Ты остаёшься полным хозяином аккаунта — движок только подсказывает ходы.</p>
+    <div class="rows">
+      <div class="row rise"><span class="m">🔑</span><div><h3>Твой вход остаётся у тебя</h3><p>Расширение работает в твоём браузере, под твоим логином. Оператор твой доступ не видит.</p></div></div>
+      <div class="row rise"><span class="m">🚫</span><div><h3>Вывести твои деньги нельзя</h3><p>Любой вывод требует твоего подтверждения на бирже. Технически увести баланс невозможно.</p></div></div>
+      <div class="row rise"><span class="m">⚡</span><div><h3>Движок присылает ходы — аккаунт исполняет</h3><p>Ты ничего не нажимаешь. Всё происходит само, пока ты занят своими делами.</p></div></div>
+      <div class="row rise"><span class="m">⏸</span><div><h3>Стоп в любой момент</h3><p>Выключил расширение или вышел из биржи — и всё замерло. Ты ничем не связан.</p></div></div>
+    </div>
+    <div class="blackbox rise">
+      <div class="k">а как именно движок находит моменты?</div>
+      <p>Это наша кухня — годы настройки и живой статистики. Тебе её знать не нужно: ты просто подключаешься и получаешь свою долю с того, что заработал твой аккаунт.</p>
+    </div>
+  </div>
+</section>
+
+<section id="join">
+  <div class="wrap">
+    <div class="box rise">
+      <div class="eyebrow" style="color:var(--amber)">поехали</div>
+      <h2>Три минуты — и аккаунт в деле</h2>
+      <div class="step-mini">
+        <span>1 · получаешь свой файл</span>
+        <span>2 · ставишь расширение</span>
+        <span>3 · заходишь в MEXC</span>
+      </div>
+      <p class="lede" style="margin:0 auto;text-align:center">Дальше он работает сам. Готов — напиши оператору, который прислал тебе эту ссылку.</p>
+      <p class="note">Профит делим по договорённости: считается по логу каждой сделки, прозрачно. Аккаунт и деньги всё время твои.</p>
+    </div>
+  </div>
+</section>
+
+<script>
+/* ---------- hero WebGL: the gap between two prices ---------- */
+(function(){
+  const c=document.getElementById('gl');
+  const gl=c.getContext('webgl')||c.getContext('experimental-webgl');
+  const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+  if(!gl){ c.style.background='radial-gradient(120% 90% at 50% 35%,#0d2b2e,#070a10)'; return; }
+  const vs=`attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}`;
+  const fs=`precision highp float;uniform vec2 R;uniform float T;
+  float wave(float x,float ph,float amp,float fr){return sin(x*fr+ph)*amp+sin(x*fr*.5-ph*1.3)*amp*.5;}
+  void main(){
+    vec2 uv=(gl_FragCoord.xy/R);
+    float x=uv.x;
+    vec3 col=vec3(0.027,0.039,0.063);
+    // two price lines: fair (cyan) and lagging (amber), converging & drifting
+    float fair=0.5+wave(x*6.2831,T*0.35,0.11,1.0);
+    float lag =0.5+wave(x*6.2831,T*0.35-0.9,0.11,1.0)*0.86-0.02;
+    float y=uv.y;
+    float dF=abs(y-fair), dL=abs(y-lag);
+    col+=vec3(0.235,0.878,0.816)*smoothstep(0.028,0.0,dF)*0.9;
+    col+=vec3(0.949,0.706,0.243)*smoothstep(0.028,0.0,dL)*0.9;
+    // the gap glow between them
+    float lo=min(fair,lag),hi=max(fair,lag);
+    float inband=smoothstep(0.0,0.02,y-lo)*smoothstep(0.0,0.02,hi-y);
+    col+=vec3(0.15,0.5,0.55)*inband*(0.10+0.06*sin(T*2.0+x*12.0));
+    // drifting particles
+    for(int i=0;i<5;i++){
+      float fi=float(i);
+      vec2 pp=vec2(fract(0.12*fi+T*(0.03+0.01*fi)),0.5+0.25*sin(T*0.5+fi*1.7));
+      float d=length((uv-pp)*vec2(R.x/R.y,1.0));
+      col+=vec3(0.2,0.7,0.7)*smoothstep(0.02,0.0,d)*0.5;
+    }
+    col+=(fract(sin(dot(gl_FragCoord.xy,vec2(12.9,78.2)))*43758.5)-0.5)*0.02;
+    gl_FragColor=vec4(col,1.0);
+  }`;
+  function sh(t,s){const o=gl.createShader(t);gl.shaderSource(o,s);gl.compileShader(o);return o;}
+  const pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,vs));gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,fs));
+  gl.linkProgram(pr);gl.useProgram(pr);
+  const buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buf);
+  gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
+  const loc=gl.getAttribLocation(pr,'p');gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
+  const uR=gl.getUniformLocation(pr,'R'),uT=gl.getUniformLocation(pr,'T');
+  function size(){const d=Math.min(devicePixelRatio||1,2);c.width=c.clientWidth*d;c.height=c.clientHeight*d;gl.viewport(0,0,c.width,c.height);}
+  addEventListener('resize',size);size();
+  let run=true,t0=null;
+  new IntersectionObserver(es=>{run=es[0].isIntersecting;if(run)req();},{threshold:0.01}).observe(c);
+  function frame(ts){if(!run)return;if(t0===null)t0=ts;const t=(ts-t0)/1000;
+    gl.uniform2f(uR,c.width,c.height);gl.uniform1f(uT,reduce?3.0:t);
+    gl.drawArrays(gl.TRIANGLE_STRIP,0,4);if(!reduce)requestAnimationFrame(frame);}
+  let asked=false;function req(){if(reduce){requestAnimationFrame(frame);return;}if(asked)return;asked=true;requestAnimationFrame(function l(ts){asked=false;frame(ts);});}
+  requestAnimationFrame(frame);
+})();
+
+/* ---------- little card canvases ---------- */
+document.querySelectorAll('canvas[data-viz]').forEach(cv=>{
+  const ctx=cv.getContext('2d');const kind=cv.dataset.viz;const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+  function fit(){const d=Math.min(devicePixelRatio||1,2);cv.width=cv.clientWidth*d;cv.height=cv.clientHeight*d;ctx.setTransform(d,0,0,d,0,0);}
+  fit();addEventListener('resize',fit);
+  let t=0;
+  function draw(){
+    const w=cv.clientWidth,h=cv.clientHeight;ctx.clearRect(0,0,w,h);t+=reduce?0:0.02;
+    if(kind==='gap'){
+      ctx.lineWidth=2;
+      ctx.strokeStyle='#3ce0d0';ctx.beginPath();for(let x=0;x<=w;x++){const y=h*0.4+Math.sin(x*0.06+t)*7;x?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.stroke();
+      ctx.strokeStyle='#f2b43e';ctx.beginPath();for(let x=0;x<=w;x++){const y=h*0.62+Math.sin(x*0.06+t-0.9)*7;x?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.stroke();
+    } else if(kind==='zero'){
+      ctx.strokeStyle='#1c2b3a';ctx.lineWidth=8;ctx.beginPath();ctx.arc(w/2,h/2,17,0,Math.PI*2);ctx.stroke();
+      ctx.strokeStyle='#3ce0d0';ctx.lineWidth=8;ctx.lineCap='round';ctx.beginPath();ctx.arc(w/2,h/2,17,-Math.PI/2,-Math.PI/2+ (reduce?6.28:(Math.sin(t)*0.5+0.5)*6.28));ctx.stroke();
+      ctx.fillStyle='#eaf1f7';ctx.font='700 16px ui-monospace,monospace';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('0%',w/2,h/2);
+    } else if(kind==='fast'){
+      for(let i=0;i<3;i++){const p=((t*0.6+i*0.34)%1);ctx.globalAlpha=1-p;ctx.strokeStyle='#3ce0d0';ctx.lineWidth=2;
+        ctx.beginPath();ctx.moveTo(4+p*(w-8),h/2);ctx.lineTo(4+p*(w-8)+14,h/2);ctx.stroke();}
+      ctx.globalAlpha=1;ctx.fillStyle='#f2b43e';ctx.beginPath();ctx.arc(w-8,h/2,4,0,6.28);ctx.fill();
+    }
+    if(!reduce)requestAnimationFrame(draw);else return;
+  }
+  new IntersectionObserver(es=>{if(es[0].isIntersecting)requestAnimationFrame(draw);},{threshold:0.1}).observe(cv);
+});
+
+/* ---------- scroll reveal ---------- */
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:0.15});
+document.querySelectorAll('.rise').forEach((el,i)=>{el.style.transitionDelay=(i%4*60)+'ms';io.observe(el);});
+</script>

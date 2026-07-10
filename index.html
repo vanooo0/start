@@ -590,14 +590,17 @@ function openGate(){document.getElementById('gate').classList.remove('hide');doc
 function closeGate(){document.getElementById('gate').classList.add('hide');document.body.style.overflow='';}
 // Flag source = the SAME host as the (working) menu flags. SVG has no width/height,
 // so we fetch it, add a size, and rasterize to a bitmap usable by both WebGL and 2D canvas.
-const FLAGSVG='https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/';
+// PNG flags (they carry an intrinsic size, unlike the menu's sizeless SVGs — those draw blank on a canvas).
+// Same host as the working menu (jsdelivr), loaded as a plain IMG (no fetch, which privacy blockers cut).
+const FLAGIMG='https://cdn.jsdelivr.net/npm/svg-country-flags@1.2.10/png1000px/';
 function hasWebGL(){try{const c=document.createElement('canvas');return !!(window.THREE&&(c.getContext('webgl')||c.getContext('experimental-webgl')));}catch(e){return false;}}
 
-function loadFlag(iso,cors,ok,fail){        // load as an IMG (same as the working menu flags), no fetch
+function loadFlag(iso,cors,ok,fail){
   const img=new Image(); if(cors)img.crossOrigin='anonymous';
-  img.onload=()=>{ const oc=document.createElement('canvas'); oc.width=1024; oc.height=768;
-    try{ oc.getContext('2d').drawImage(img,0,0,1024,768); ok(oc); }catch(e){ fail(); } };
-  img.onerror=fail; img.src=FLAGSVG+iso+'.svg';
+  img.onload=()=>{ const w=img.naturalWidth||1000, h=img.naturalHeight||750;
+    const oc=document.createElement('canvas'); oc.width=w; oc.height=h;
+    try{ oc.getContext('2d').drawImage(img,0,0,w,h); ok(oc); }catch(e){ fail(); } };
+  img.onerror=fail; img.src=FLAGIMG+iso+'.png';
 }
 function flyFlag(iso,done){
   // 1st try: CORS-clean image -> enables the WebGL 3D flag. If that can't load, fall back to a

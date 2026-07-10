@@ -597,21 +597,29 @@ const FLAGDATA={"gb": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQwIiBoZWlnaHQ
 function mkCanvas(){ const c=document.createElement('canvas');
   c.style.cssText='position:fixed;inset:0;z-index:2147483647;width:100vw;height:100vh;pointer-events:none;display:block';
   document.body.appendChild(c); return c; }
+function dbg(m){ let d=document.getElementById('dbg');
+  if(!d){ d=document.createElement('div'); d.id='dbg';
+    d.style.cssText='position:fixed;top:0;left:0;max-width:100vw;z-index:2147483647;background:rgba(0,0,0,.85);color:#39ff5a;font:12px/1.45 monospace;padding:7px 9px;white-space:pre-wrap;pointer-events:none;border-bottom-right-radius:8px';
+    document.body.appendChild(d); }
+  d.textContent=(d.textContent+'\n'+m).split('\n').slice(-14).join('\n'); document.body.appendChild(d); }
 function flyFlag(iso,done){
+  dbg('flyFlag iso='+iso+' dataLen='+((FLAGDATA[iso]||'').length));
   const img=new Image();
   img.onload=()=>{
     const oc=document.createElement('canvas'); const w=img.naturalWidth||1000, h=img.naturalHeight||750;
     oc.width=w; oc.height=h; oc.getContext('2d').drawImage(img,0,0,w,h);
     let wgl=false; try{const t=document.createElement('canvas'); wgl=!!(window.THREE&&(t.getContext('webgl')||t.getContext('experimental-webgl')));}catch(e){}
+    dbg('img LOADED '+w+'x'+h+' THREE='+(!!window.THREE)+' webgl='+wgl);
     if(wgl) runFly3D(oc,done); else runFly2D(oc,done);
   };
-  img.onerror=()=>done&&done();
+  img.onerror=()=>{ dbg('img ERROR (флаг не загрузился)'); done&&done(); };
   img.src=FLAGDATA[iso]||FLAGDATA.gb;
 }
 function runFly3D(oc,done){
+  dbg('runFly3D start');
   let cv,rnd,geo,mat,tex,guard,raf=0,fin=false;
   function cleanup(){ try{cv&&cv.remove();geo&&geo.dispose();mat&&mat.dispose();tex&&tex.dispose();rnd&&rnd.dispose();}catch(_){}}
-  function bail(){ if(fin)return; fin=true; clearTimeout(guard); if(raf)cancelAnimationFrame(raf); cleanup(); runFly2D(oc,done); }
+  function bail(){ if(fin)return; fin=true; clearTimeout(guard); if(raf)cancelAnimationFrame(raf); cleanup(); dbg('3D FAIL -> 2D fallback'); runFly2D(oc,done); }
   function finish(){ if(fin)return; fin=true; clearTimeout(guard); if(raf)cancelAnimationFrame(raf); cleanup(); done&&done(); }
   try{
     cv=mkCanvas();
@@ -651,6 +659,7 @@ function runFly3D(oc,done){
   }catch(e){ bail(); }
 }
 function runFly2D(oc,done){    // bulletproof: pure 2D, draws frame 0 at once, safety timeout
+  dbg('runFly2D start '+oc.width+'x'+oc.height);
   const cv=mkCanvas(); const dpr=Math.min(devicePixelRatio||1,2), W=innerWidth, H=innerHeight;
   cv.width=Math.max(1,Math.floor(W*dpr)); cv.height=Math.max(1,Math.floor(H*dpr));
   const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
@@ -676,6 +685,7 @@ function runFly2D(oc,done){    // bulletproof: pure 2D, draws frame 0 at once, s
 }
 document.querySelectorAll('.langopt').forEach(b=>b.onclick=()=>{
   const code=b.dataset.lang, iso=FLAG[code]||'gb';
+  dbg('CLICK '+code+'->'+iso+' reduceMotion='+matchMedia('(prefers-reduced-motion:reduce)').matches);
   applyLang(code);
   window.scrollTo(0,0);                        // start every language swap from the top (hidden by the flag)
   const gate=document.getElementById('gate');

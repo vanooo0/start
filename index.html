@@ -819,9 +819,8 @@ function flyFlag(iso,done){
     const oc=document.createElement('canvas'); oc.width=Math.round(nw*SC); oc.height=Math.round(nh*SC);
     const octx=oc.getContext('2d'); octx.imageSmoothingEnabled=true; octx.imageSmoothingQuality='high';
     octx.drawImage(img,0,0,oc.width,oc.height);   // rasterize the vector flag at high res -> crisp when zoomed
-    let wgl=false; try{const t2=document.createElement('canvas'); wgl=!!(window.THREE&&(t2.getContext('webgl')||t2.getContext('experimental-webgl')));}catch(e){}
-    dbg('img '+nw+'x'+nh+' -> '+oc.width+'x'+oc.height+' webgl='+wgl);
-    if(wgl) runFly3D(oc,done); else runFly2D(oc,done);   // true 3D; self-checks and drops to 2D if it renders blank
+    dbg('img '+nw+'x'+nh+' -> '+oc.width+'x'+oc.height);
+    runFly2D(oc,done);   // reliable high-res 2D cloth (3D renders nothing on this machine)
   };
   img.onerror=()=>{ dbg('img ERROR (флаг не загрузился)'); done&&done(); };
   img.src=FLAGDATA[iso]||FLAGDATA.gb;
@@ -883,18 +882,22 @@ function runFly2D(oc,done){    // bulletproof: pure 2D, draws frame 0 at once, s
   cv.width=Math.max(1,Math.floor(W*dpr)); cv.height=Math.max(1,Math.floor(H*dpr));
   const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
   ctx.imageSmoothingEnabled=true; ctx.imageSmoothingQuality='high';
-  const IW=oc.width, IH=oc.height, DUR=1050; let start=null, raf=0, fin=false;
+  const IW=oc.width, IH=oc.height, DUR=1400; let start=null, raf=0, fin=false;
   function frame(t){
     const e=t<0?0:t>1?1:t; ctx.clearRect(0,0,W,H);
-    const b=Math.min(W/IW,H/IH)*0.92, zoom=b*(1+e*e*6.5);
+    const b=Math.min(W/IW,H/IH)*0.95, zoom=b*(1+e*e*5.2);
     const dw=IW*zoom, dh=IH*zoom, cx=W/2, cy=H/2, left=cx-dw/2, top=cy-dh/2;
-    const N=64, ssw=IW/N, dsw=dw/N, amp=dh*0.07*(1-e*0.5), phase=t*Math.PI*4;
-    ctx.globalAlpha=e<0.72?1:Math.max(0,1-(e-0.72)/0.28);
-    for(let i=0;i<N;i++){ const wob=Math.sin(i/N*Math.PI*3+phase), yo=wob*amp, dx=left+i*dsw;
-      ctx.drawImage(oc,i*ssw,0,ssw,IH, dx,top+yo, dsw+1,dh);
-      ctx.fillStyle= wob<0? 'rgba(0,0,0,'+(0.30*-wob)+')' : 'rgba(255,255,255,'+(0.16*wob)+')';
-      ctx.fillRect(dx,top+yo,dsw+1,dh); }
-    ctx.globalAlpha=1;
+    const N=130, ssw=IW/N, dsw=dw/N, amp=dh*0.06*(1-e*0.35), ph=t*7;
+    ctx.globalAlpha=e<0.8?1:Math.max(0,1-(e-0.8)/0.2);
+    for(let i=0;i<N;i++){ const nx=i/N;
+      const wob=Math.sin(nx*Math.PI*3-ph)*0.72 + Math.sin(nx*Math.PI*6-ph*0.8)*0.28;
+      const yo=wob*amp*(0.32+nx*0.68);
+      ctx.drawImage(oc, i*ssw,0, ssw,IH, left+i*dsw, top+yo, dsw+1.4, dh); }
+    const g=ctx.createLinearGradient(left,0,left+dw,0);
+    for(let k=0;k<=14;k++){ const nx=k/14, bb=Math.sin(nx*Math.PI*3-ph); const v=bb>0?255:0;
+      g.addColorStop(nx,'rgba('+v+','+v+','+v+','+(Math.abs(bb)*0.26).toFixed(3)+')'); }
+    ctx.globalCompositeOperation='soft-light'; ctx.fillStyle=g; ctx.fillRect(left,top-amp,dw,dh+amp*2);
+    ctx.globalCompositeOperation='source-over'; ctx.globalAlpha=1;
   }
   frame(0); dbg('2D frame0 нарисован W='+W+' H='+H);
   function loop(ts){ if(fin)return; if(start===null)start=ts; frame((ts-start)/DUR);

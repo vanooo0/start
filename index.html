@@ -210,7 +210,7 @@ h2{font-size:clamp(30px,5.5vw,48px);line-height:1.08;margin:0 0 20px;font-weight
   </div>
 </section>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r128/build/three.min.js"></script>
 <script>
 const I18N={
  en:{name:"English",badge:"MEXC · zero-fee pairs",h1a:"Your account",h1b:"works on its own",
@@ -588,12 +588,27 @@ function applyLang(code){
 }
 function openGate(){document.getElementById('gate').classList.remove('hide');document.body.style.overflow='hidden';}
 function closeGate(){document.getElementById('gate').classList.add('hide');document.body.style.overflow='';}
-const FLAGPNG='https://flagcdn.com/w1280/';
-// 3D waving-flag fly-through: a real cloth mesh ripples while the camera dives through it.
-// The flag texture is fully loaded BEFORE the animation starts, so it's never blank.
-function runFly(tex,done){
-  const cv=document.getElementById('flycanvas');
-  cv.style.display='block'; cv.style.opacity='1';
+// Flag source = the SAME host as the (working) menu flags. SVG has no width/height,
+// so we fetch it, add a size, and rasterize to a bitmap usable by both WebGL and 2D canvas.
+const FLAGSVG='https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/';
+function hasWebGL(){try{const c=document.createElement('canvas');return !!(window.THREE&&(c.getContext('webgl')||c.getContext('experimental-webgl')));}catch(e){return false;}}
+
+function flyFlag(iso,done){
+  fetch(FLAGSVG+iso+'.svg').then(r=>r.text()).then(txt=>{
+    txt=txt.replace('<svg ','<svg width="640" height="480" ');
+    const url=URL.createObjectURL(new Blob([txt],{type:'image/svg+xml'}));
+    const img=new Image();
+    img.onload=()=>{
+      const oc=document.createElement('canvas'); oc.width=1024; oc.height=768;
+      oc.getContext('2d').drawImage(img,0,0,1024,768); URL.revokeObjectURL(url);
+      (hasWebGL()?runFly3D:runFly2D)(oc,done);
+    };
+    img.onerror=()=>{URL.revokeObjectURL(url);done&&done();};
+    img.src=url;
+  }).catch(()=>done&&done());
+}
+function runFly3D(oc,done){
+  const cv=document.getElementById('flycanvas'); cv.style.display='block'; cv.style.opacity='1';
   const rnd=new THREE.WebGLRenderer({canvas:cv,alpha:true,antialias:true});
   rnd.setPixelRatio(Math.min(devicePixelRatio||1,2)); rnd.setSize(innerWidth,innerHeight);
   const scene=new THREE.Scene();
@@ -602,6 +617,8 @@ function runFly(tex,done){
   const dl=new THREE.DirectionalLight(0xffffff,0.95); dl.position.set(2.5,3,5); scene.add(dl);
   const geo=new THREE.PlaneGeometry(7,4.2,54,32);
   const base=Float32Array.from(geo.attributes.position.array);
+  const tex=new THREE.CanvasTexture(oc);
+  if('colorSpace' in tex && THREE.SRGBColorSpace) tex.colorSpace=THREE.SRGBColorSpace;
   const mat=new THREE.MeshPhongMaterial({map:tex,side:THREE.DoubleSide,shininess:6});
   const flag=new THREE.Mesh(geo,mat); scene.add(flag);
   let t0=null;
@@ -611,7 +628,7 @@ function runFly(tex,done){
     for(let i=0;i<pos.count;i++){const x=base[i*3],y=base[i*3+1],nx=(x+3.5)/7;
       pos.array[i*3+2]=Math.sin(nx*6.0-t*5.5)*0.45*nx + Math.sin(y*3.2+t*3.0)*0.07;}
     pos.needsUpdate=true; geo.computeVertexNormals();
-    const e=p<0.5?2*p*p:1-Math.pow(-2*p+2,2)/2;         // easeInOut
+    const e=p<0.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
     cam.position.z=4.2-e*6.4; cam.position.x=Math.sin(p*Math.PI)*0.55; flag.rotation.y=Math.sin(t*0.8)*0.05;
     rnd.render(scene,cam);
     cv.style.opacity=p>0.82?String(Math.max(0,1-(p-0.82)/0.18)):'1';
@@ -619,17 +636,32 @@ function runFly(tex,done){
     else{cv.style.display='none';cv.style.opacity='1';geo.dispose();mat.dispose();tex.dispose();rnd.dispose();done&&done();}
   })();
 }
+function runFly2D(oc,done){    // fallback when WebGL is off: waving flag on a 2D canvas
+  const cv=document.getElementById('flycanvas'); cv.style.display='block';
+  const dpr=Math.min(devicePixelRatio||1,2), W=innerWidth, H=innerHeight;
+  cv.width=W*dpr; cv.height=H*dpr; const ctx=cv.getContext('2d'); ctx.scale(dpr,dpr);
+  const ar=oc.width/oc.height; let t0=null;
+  (function frame(ts){
+    if(t0===null)t0=ts; const t=(ts-t0)/1000, p=Math.min(t/1.8,1);
+    const e=p<0.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
+    ctx.clearRect(0,0,W,H);
+    const fw=Math.min(W*0.9,H*0.9*ar)*(0.5+e*2.6), fh=fw/ar, cx=W/2, cy=H/2;
+    const N=54, sw=oc.width/N, dw=fw/N, amp=fh*0.07*(1-p*0.5);
+    ctx.globalAlpha=p>0.82?Math.max(0,1-(p-0.82)/0.18):1;
+    for(let i=0;i<N;i++){const off=Math.sin(i*0.42-t*6)*amp*(i/N*0.7+0.3);
+      ctx.drawImage(oc,i*sw,0,sw,oc.height, cx-fw/2+i*dw, cy-fh/2+off, dw+1, fh);}
+    ctx.globalAlpha=1;
+    if(p<1)requestAnimationFrame(frame); else{cv.style.display='none'; done&&done();}
+  })();
+}
 document.querySelectorAll('.langopt').forEach(b=>b.onclick=()=>{
   const code=b.dataset.lang, iso=FLAG[code]||'gb';
   applyLang(code);
   const gate=document.getElementById('gate');
   const fin=()=>{ closeGate(); gate.style.opacity=''; gate.style.transition=''; };
-  if(matchMedia('(prefers-reduced-motion:reduce)').matches||!window.THREE){closeGate();return;}
-  new THREE.TextureLoader().load(FLAGPNG+iso+'.png',
-    tex=>{ if('colorSpace' in tex && THREE.SRGBColorSpace) tex.colorSpace=THREE.SRGBColorSpace;
-           gate.style.transition='opacity .4s ease'; gate.style.opacity='0'; runFly(tex,fin); },
-    undefined,
-    ()=>{ closeGate(); });   // flag image failed to load -> just enter the site
+  if(matchMedia('(prefers-reduced-motion:reduce)').matches){closeGate();return;}
+  gate.style.transition='opacity .4s ease'; gate.style.opacity='0';
+  flyFlag(iso,fin);
 });
 document.getElementById('langbtn').onclick=openGate;
 (function(){

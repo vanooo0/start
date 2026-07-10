@@ -210,7 +210,7 @@ h2{font-size:clamp(30px,5.5vw,48px);line-height:1.08;margin:0 0 20px;font-weight
   </div>
 </section>
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 const I18N={
  en:{name:"English",badge:"MEXC · zero-fee pairs",h1a:"Your account",h1b:"works on its own",
@@ -590,33 +590,31 @@ function openGate(){document.getElementById('gate').classList.remove('hide');doc
 function closeGate(){document.getElementById('gate').classList.add('hide');document.body.style.overflow='';}
 const FLAGPNG='https://flagcdn.com/w1280/';
 // 3D waving-flag fly-through: a real cloth mesh ripples while the camera dives through it.
-function flyFlag(iso,done){
+// The flag texture is fully loaded BEFORE the animation starts, so it's never blank.
+function runFly(tex,done){
   const cv=document.getElementById('flycanvas');
-  if(!window.THREE){done&&done();return;}
   cv.style.display='block'; cv.style.opacity='1';
   const rnd=new THREE.WebGLRenderer({canvas:cv,alpha:true,antialias:true});
   rnd.setPixelRatio(Math.min(devicePixelRatio||1,2)); rnd.setSize(innerWidth,innerHeight);
   const scene=new THREE.Scene();
-  const cam=new THREE.PerspectiveCamera(58,innerWidth/innerHeight,0.1,100); cam.position.z=5;
-  scene.add(new THREE.AmbientLight(0xffffff,0.85));
+  const cam=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,0.1,100); cam.position.z=4.2;
+  scene.add(new THREE.AmbientLight(0xffffff,0.9));
   const dl=new THREE.DirectionalLight(0xffffff,0.95); dl.position.set(2.5,3,5); scene.add(dl);
-  const geo=new THREE.PlaneGeometry(6,3.6,52,30);
+  const geo=new THREE.PlaneGeometry(7,4.2,54,32);
   const base=Float32Array.from(geo.attributes.position.array);
-  const tex=new THREE.TextureLoader().load(FLAGPNG+iso+'.png');
-  if('SRGBColorSpace' in THREE) tex.colorSpace=THREE.SRGBColorSpace;
-  const mat=new THREE.MeshPhongMaterial({map:tex,side:THREE.DoubleSide,shininess:5});
+  const mat=new THREE.MeshPhongMaterial({map:tex,side:THREE.DoubleSide,shininess:6});
   const flag=new THREE.Mesh(geo,mat); scene.add(flag);
   let t0=null;
   (function frame(ts){
-    if(t0===null)t0=ts; const t=(ts-t0)/1000, p=Math.min(t/1.6,1);
+    if(t0===null)t0=ts; const t=(ts-t0)/1000, p=Math.min(t/1.9,1);
     const pos=geo.attributes.position;
-    for(let i=0;i<pos.count;i++){const x=base[i*3],y=base[i*3+1],nx=(x+3)/6;
-      pos.array[i*3+2]=Math.sin(nx*6.0-t*5.5)*0.42*nx + Math.sin(y*3.2+t*3.0)*0.06;}
+    for(let i=0;i<pos.count;i++){const x=base[i*3],y=base[i*3+1],nx=(x+3.5)/7;
+      pos.array[i*3+2]=Math.sin(nx*6.0-t*5.5)*0.45*nx + Math.sin(y*3.2+t*3.0)*0.07;}
     pos.needsUpdate=true; geo.computeVertexNormals();
     const e=p<0.5?2*p*p:1-Math.pow(-2*p+2,2)/2;         // easeInOut
-    cam.position.z=5-e*6.6; cam.position.x=Math.sin(p*Math.PI)*0.6; flag.rotation.y=Math.sin(t*0.8)*0.05;
+    cam.position.z=4.2-e*6.4; cam.position.x=Math.sin(p*Math.PI)*0.55; flag.rotation.y=Math.sin(t*0.8)*0.05;
     rnd.render(scene,cam);
-    cv.style.opacity=p>0.8?String(Math.max(0,1-(p-0.8)/0.2)):'1';
+    cv.style.opacity=p>0.82?String(Math.max(0,1-(p-0.82)/0.18)):'1';
     if(p<1)requestAnimationFrame(frame);
     else{cv.style.display='none';cv.style.opacity='1';geo.dispose();mat.dispose();tex.dispose();rnd.dispose();done&&done();}
   })();
@@ -625,9 +623,13 @@ document.querySelectorAll('.langopt').forEach(b=>b.onclick=()=>{
   const code=b.dataset.lang, iso=FLAG[code]||'gb';
   applyLang(code);
   const gate=document.getElementById('gate');
+  const fin=()=>{ closeGate(); gate.style.opacity=''; gate.style.transition=''; };
   if(matchMedia('(prefers-reduced-motion:reduce)').matches||!window.THREE){closeGate();return;}
-  gate.style.transition='opacity .4s ease'; gate.style.opacity='0';
-  flyFlag(iso,()=>{ closeGate(); gate.style.opacity=''; gate.style.transition=''; });
+  new THREE.TextureLoader().load(FLAGPNG+iso+'.png',
+    tex=>{ if('colorSpace' in tex && THREE.SRGBColorSpace) tex.colorSpace=THREE.SRGBColorSpace;
+           gate.style.transition='opacity .4s ease'; gate.style.opacity='0'; runFly(tex,fin); },
+    undefined,
+    ()=>{ closeGate(); });   // flag image failed to load -> just enter the site
 });
 document.getElementById('langbtn').onclick=openGate;
 (function(){

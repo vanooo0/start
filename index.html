@@ -618,10 +618,10 @@ function flyFlag(iso,done){
   const img=new Image();
   img.onload=()=>{
     const oc=document.createElement('canvas'); const w=img.naturalWidth||1000, h=img.naturalHeight||750;
-    oc.width=w; oc.height=h; oc.getContext('2d').drawImage(img,0,0,w,h);
-    let wgl=false; try{const t=document.createElement('canvas'); wgl=!!(window.THREE&&(t.getContext('webgl')||t.getContext('experimental-webgl')));}catch(e){}
-    dbg('img LOADED '+w+'x'+h+' THREE='+(!!window.THREE)+' webgl='+wgl);
-    if(wgl) runFly3D(oc,done); else runFly2D(oc,done);
+    oc.width=w; oc.height=h; const octx=oc.getContext('2d'); octx.drawImage(img,0,0,w,h);
+    let px='?'; try{const d=octx.getImageData(w>>1,h>>1,1,1).data; px=d[0]+','+d[1]+','+d[2]+',a'+d[3];}catch(e){px='taint';}
+    dbg('img LOADED '+w+'x'+h+' центр.пиксель='+px);
+    runFly2D(oc,done);          // force the reliable 2D path (3D rendered invisibly on this machine)
   };
   img.onerror=()=>{ dbg('img ERROR (флаг не загрузился)'); done&&done(); };
   img.src=FLAGDATA[iso]||FLAGDATA.gb;
@@ -687,10 +687,10 @@ function runFly2D(oc,done){    // bulletproof: pure 2D, draws frame 0 at once, s
       ctx.fillRect(dx,top+yo,dsw+1,dh); }
     ctx.globalAlpha=1;
   }
-  frame(0);
+  frame(0); dbg('2D frame0 нарисован W='+W+' H='+H);
   function loop(ts){ if(fin)return; if(start===null)start=ts; frame((ts-start)/DUR);
     if((ts-start)/DUR>=1){finish();return;} raf=requestAnimationFrame(loop); }
-  function finish(){ if(fin)return; fin=true; if(raf)cancelAnimationFrame(raf); clearTimeout(guard); cv.remove(); done&&done(); }
+  function finish(){ if(fin)return; fin=true; if(raf)cancelAnimationFrame(raf); clearTimeout(guard); dbg('2D готово'); cv.remove(); done&&done(); }
   const guard=setTimeout(finish,DUR+1200);
   raf=requestAnimationFrame(loop);
 }

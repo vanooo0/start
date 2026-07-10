@@ -21,7 +21,8 @@ body{margin:0;background:var(--bg);color:var(--ink);
 .gate-card{max-width:440px;width:100%;text-align:center}
 .globe{font-size:46px;margin-bottom:14px;animation:spin 14s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.gate-card{max-height:92vh;overflow-y:auto}
+.gate-card{max-height:92vh;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none}
+.gate-card::-webkit-scrollbar{display:none}
 .gate-t{font-size:24px;font-weight:750;letter-spacing:-.4px;margin-bottom:8px}
 .gate-s{color:var(--soft);font-size:13.5px;margin-bottom:16px;line-height:1.5}
 .flagbar{overflow:hidden;margin:0 auto 22px;max-width:340px;
@@ -570,15 +571,15 @@ function applyLang(code){
   document.getElementById('langflag').textContent=FLAG[code]||'🌐';
   try{localStorage.setItem('flip_lang',code);}catch(e){}
 }
-function openGate(){document.getElementById('gate').classList.remove('hide');}
-function closeGate(){document.getElementById('gate').classList.add('hide');}
+function openGate(){document.getElementById('gate').classList.remove('hide');document.body.style.overflow='hidden';}
+function closeGate(){document.getElementById('gate').classList.add('hide');document.body.style.overflow='';}
 document.querySelectorAll('.langopt').forEach(b=>b.onclick=()=>{applyLang(b.dataset.lang);closeGate();});
 document.getElementById('langbtn').onclick=openGate;
 (function(){
   let saved=null;try{saved=localStorage.getItem('flip_lang');}catch(e){}
   const guess=(navigator.language||'en').slice(0,2);
   applyLang(saved||(I18N[guess]?guess:'en'));   // fill behind the gate
-  if(saved){closeGate();}                        // returning visitor skips the gate
+  if(saved){closeGate();}else{openGate();}       // returning visitor skips the gate
 })();
 
 /* ---------- hero WebGL: the gap between two prices ---------- */

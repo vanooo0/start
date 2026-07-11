@@ -210,6 +210,12 @@ h2{font-size:clamp(30px,5.5vw,48px);line-height:1.08;margin:0 0 20px;font-weight
   #fx svg{max-width:26vw;height:auto}          /* keep drawn scenes inside the screen on phones */
   #fx .p{font-size:min(1em,11vw)}
 }
+.contacts{position:relative;z-index:3;border-top:1px solid var(--line);margin-top:36px;padding:34px 24px 30px}
+.cwrap{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;max-width:760px;margin:0 auto}
+.ct{display:inline-flex;align-items:center;gap:9px;background:var(--card);border:1px solid var(--line);
+  border-radius:999px;padding:9px 17px;color:var(--ink);text-decoration:none;font-size:14.5px;font-weight:600;transition:.2s}
+.ct:hover{border-color:var(--cyan);transform:translateY(-2px)}
+.ct svg{color:var(--cyan);flex:none}
 </style>
 
 <div id="gate">
@@ -301,6 +307,15 @@ h2{font-size:clamp(30px,5.5vw,48px);line-height:1.08;margin:0 0 20px;font-weight
     </div>
   </div>
 </section>
+
+<footer class="contacts"><div class="cwrap">
+  <a class="ct" href="https://t.me/mmariokart" target="_blank" rel="noopener">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M21.9 4.3 18.7 19.4c-.2 1-.9 1.3-1.8.8l-4.9-3.6-2.4 2.3c-.3.3-.5.5-1 .5l.4-5 9.1-8.2c.4-.3-.1-.5-.6-.2L6.7 13.1l-4.8-1.5c-1-.3-1-1 .3-1.5L20.5 3c.9-.3 1.6.2 1.4 1.3z"/></svg>
+    <span>@mmariokart</span></a>
+  <a class="ct" href="https://x.com/uanekia" target="_blank" rel="noopener">
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M18.9 2H22l-7.6 8.7L23 22h-6.8l-5.3-6.9L4.8 22H1.6l8.1-9.3L1 2h7l4.8 6.3L18.9 2Zm-1.2 18h1.7L7.1 3.8H5.3L17.7 20Z"/></svg>
+    <span>@uanekia</span></a>
+</div></footer>
 
 <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r128/build/three.min.js"></script>
 <script>

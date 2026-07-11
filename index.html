@@ -865,8 +865,8 @@ const SCENES={
  vi:fx=>{ mkH(fx,SVG_HAT,'left:8vw;bottom:13vh;transform-origin:bottom center;animation:sunGrow 1s cubic-bezier(.2,1.3,.4,1) forwards');
    mkH(fx,'<div class="bob2"><span style="display:inline-block;transform:scaleX(-1);font-size:40px">🛵</span></div>','bottom:11vh;left:0;animation:runX 4.6s linear forwards'); popAt(fx,'🪷','right:8vw;bottom:9vh',44,0.5); },
  hi:fx=>{ fx.insertAdjacentHTML('beforeend','<div class="bearRun"><div class="bob">'+SVG_ELEPHANT+'</div></div>');
-   mkH(fx,SVG_PEACOCK,'right:6vw;bottom:9vh;transform-origin:bottom center;animation:sunGrow 1.1s cubic-bezier(.2,1.3,.4,1) forwards');
-   pop(fx,'🪔','bl',44); drift(fx,'🌼',9); },
+   mkH(fx,SVG_PEACOCK,'left:7vw;bottom:22vh;transform-origin:bottom center;animation:sunGrow 1.1s cubic-bezier(.2,1.3,.4,1) forwards');
+   pop(fx,'🪔','br',44); drift(fx,'🌼',9); },
  zh:fx=>{ fly(fx,'<div style="font-size:58px">🐉</div>',{x0:-100,y0:innerHeight*0.17,x1:innerWidth+100,y1:innerHeight*0.17,arc:innerHeight*0.06,spin:0},3200);
    popAt(fx,'🏮','right:10vw;bottom:16vh',52,0.3); setTimeout(()=>burst(fx,innerWidth*0.5,innerHeight*0.2,{n:14,color:'#ffde00',sz:6}),1500); },
  ja:fx=>{ for(let i=0;i<16;i++) mkH(fx,SVG_PETAL,'top:-6vh;left:'+(Math.random()*100).toFixed(1)+'%;width:'+(12+Math.random()*8|0)+'px;animation:petalDrift '+(6+Math.random()*4).toFixed(1)+'s linear '+(Math.random()*4).toFixed(1)+'s forwards');

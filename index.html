@@ -809,6 +809,17 @@ const SVG_ELEPHANT='<svg viewBox="0 0 156 100" width="150" style="filter:drop-sh
  '<path d="M90 28 q-20 2 -16 28 q12 5 20 -6z" fill="#7c8494"/></g>'+
  '<path d="M122 56 l8 -3 M128 62 l9 -1" stroke="#efe7d6" stroke-width="3.2" stroke-linecap="round"/>'+
  '<circle cx="118" cy="40" r="2.6" fill="#17110a"/></svg>';
+const SVG_CAMEL='<svg viewBox="0 0 162 106" width="150" style="filter:drop-shadow(0 5px 7px rgba(0,0,0,.4))">'+
+ '<g class="legA" fill="#b0854a"><rect x="34" y="64" width="12" height="36" rx="5"/><rect x="102" y="64" width="12" height="36" rx="5"/></g>'+
+ '<g class="legB" fill="#bd9052"><rect x="56" y="64" width="12" height="36" rx="5"/><rect x="80" y="64" width="12" height="36" rx="5"/></g>'+
+ '<g fill="#c79a5b"><path d="M26 66 Q24 42 44 44 Q52 20 68 44 Q90 40 112 50 Q120 52 120 66 Q102 73 62 73 Q36 73 26 66Z"/>'+
+ '<path d="M110 52 Q126 48 130 26 Q131 16 138 16 Q142 22 136 30 Q134 48 122 60Z"/><path d="M135 16 q7 -4 9 3 q-4 3 -9 0z"/></g>'+
+ '<circle cx="132" cy="22" r="2.3" fill="#3a2a12"/></svg>';
+const SVG_CARPET='<svg viewBox="0 0 124 46" width="122" style="filter:drop-shadow(0 4px 6px rgba(0,0,0,.4))">'+
+ '<path d="M6 23 Q32 9 62 13 Q92 9 118 23 Q92 37 62 33 Q32 37 6 23Z" fill="#7a2fd6" stroke="#ffd23f" stroke-width="2"/>'+
+ '<path d="M16 22 Q62 15 108 22" stroke="#ffd23f" stroke-width="1.4" fill="none"/>'+
+ '<circle cx="32" cy="22" r="2.2" fill="#ffd23f"/><circle cx="62" cy="21" r="2.2" fill="#ff6b6b"/><circle cx="92" cy="22" r="2.2" fill="#ffd23f"/>'+
+ '<path d="M6 23 l-6 -3 M6 23 l-6 3 M118 23 l6 -3 M118 23 l6 3" stroke="#ffd23f" stroke-width="1.6"/></svg>';
 function drift(fx,ch,n){for(let i=0;i<(n||14);i++)mk(fx,ch,'top:-7vh;left:'+(Math.random()*100).toFixed(1)+'%;font-size:'+(15+Math.random()*18|0)+'px;opacity:0;animation:petalFall '+(5+Math.random()*4).toFixed(1)+'s linear '+(Math.random()*3.5).toFixed(1)+'s forwards');}
 function runX(fx,ch,vh,dur,sz){return mk(fx,ch,'bottom:'+(vh||10)+'vh;left:0;white-space:nowrap;font-size:'+(sz||46)+'px;animation:runX '+(dur||4.4)+'s linear forwards');}
 function arc(fx,ch){return mk(fx,ch,'left:0;top:34%;font-size:42px;animation:arcX 2.3s ease-in forwards');}
@@ -872,8 +883,14 @@ const SCENES={
  ja:fx=>{ for(let i=0;i<16;i++) mkH(fx,SVG_PETAL,'top:-6vh;left:'+(Math.random()*100).toFixed(1)+'%;width:'+(12+Math.random()*8|0)+'px;animation:petalDrift '+(6+Math.random()*4).toFixed(1)+'s linear '+(Math.random()*4).toFixed(1)+'s forwards');
    mkH(fx,SVG_TORII,'left:8vw;bottom:13vh;animation:toriiIn 1.2s ease-out .3s forwards'); },
  ko:fx=>{ mkH(fx,SVG_TAEGEUK,'left:8vw;bottom:16vh;transform-origin:center;animation:spinIn 1.1s cubic-bezier(.2,1.2,.4,1) forwards'); drift(fx,'✨',10); pop(fx,'🎏','br',46); },
- ar:fx=>{ pop(fx,'🌴','br',72); pop(fx,'🐪','bl',54); popAt(fx,'☕','left:44vw;bottom:9vh',44,0.5); },
- fa:fx=>{ pop(fx,'🌹','br'); pop(fx,'🐱','bl',54); popAt(fx,'🍵','left:44vw;bottom:9vh',44,0.6); }
+ ar:fx=>{ fx.insertAdjacentHTML('beforeend','<div class="bearRun"><div class="bob">'+SVG_CAMEL+'</div></div>');
+   mkH(fx,'<div style="font-size:66px">🌴</div>','right:7vw;bottom:9vh;transform-origin:bottom center;animation:sunGrow 1.1s cubic-bezier(.2,1.3,.4,1) forwards, flutter 3s ease-in-out 1.1s infinite');
+   for(let i=0;i<8;i++){ setTimeout(()=>{ const z=(5+Math.random()*5|0); const s=mk(fx,'','left:'+(43+Math.random()*4).toFixed(1)+'vw;bottom:14vh;width:'+z+'px;height:'+z+'px;animation:bubUp 1.6s ease-out forwards'); s.style.background='rgba(220,220,220,.5)'; s.style.borderRadius='50%'; },600+i*220); }
+   popAt(fx,'☕','left:44vw;bottom:9vh',42,0.4); },
+ fa:fx=>{ fly(fx,'<div>'+SVG_CARPET+'</div>',{x0:-140,y0:innerHeight*0.24,x1:innerWidth+140,y1:innerHeight*0.2,arc:innerHeight*0.06,spin:0},3200);
+   mkH(fx,'<div style="font-size:56px">🌹</div>','left:8vw;bottom:11vh;transform-origin:bottom center;animation:sunGrow 1.1s cubic-bezier(.2,1.3,.4,1) forwards, flutter 2.6s ease-in-out 1.1s infinite');
+   for(let i=0;i<8;i++){ setTimeout(()=>{ const z=(5+Math.random()*5|0); const s=mk(fx,'','left:'+(43+Math.random()*4).toFixed(1)+'vw;bottom:14vh;width:'+z+'px;height:'+z+'px;animation:bubUp 1.6s ease-out forwards'); s.style.background='rgba(220,220,220,.5)'; s.style.borderRadius='50%'; },600+i*220); }
+   popAt(fx,'🐱','right:8vw;bottom:9vh',48,0.4); popAt(fx,'🍵','left:44vw;bottom:9vh',40,0.7); }
 };
 function playScene(code){
   const fx=document.getElementById('fx'); if(!fx)return; fx.innerHTML='';

@@ -125,7 +125,7 @@ h2{font-size:clamp(30px,5.5vw,48px);line-height:1.08;margin:0 0 20px;font-weight
 @keyframes sunGrow{0%{transform:scale(0) rotate(-35deg);opacity:0}60%{opacity:1}100%{transform:scale(1) rotate(0)}}
 @keyframes riseSway{0%{transform:translateY(30px) translateX(0);opacity:0}12%{opacity:1}55%{transform:translateY(-58vh) translateX(24px)}100%{transform:translateY(-120vh) translateX(-6px);opacity:0}}
 @keyframes spinIn{0%{transform:scale(0) rotate(-560deg);opacity:0}60%{opacity:1}100%{transform:scale(1) rotate(0)}}
-.bearRun{bottom:10vh;left:0;animation:bearAcross 4.2s linear forwards}
+.bearRun{bottom:16vh;left:0;animation:bearAcross 4.2s linear forwards}
 .bearRun .bob{animation:bearBob .46s ease-in-out infinite;transform-origin:center bottom}
 @keyframes bearAcross{0%{transform:translateX(-180px)}100%{transform:translateX(107vw)}}
 @keyframes bearBob{0%,100%{transform:translateY(0) rotate(-2.5deg)}50%{transform:translateY(-12px) rotate(2.5deg)}}
@@ -202,6 +202,10 @@ h2{font-size:clamp(30px,5.5vw,48px);line-height:1.08;margin:0 0 20px;font-weight
   #langbtn{top:12px;right:12px;padding:6px 11px;font-size:12px}
 }
 @media (max-width:400px){ .gate-card{max-width:100%} }
+@media (max-width:560px){
+  #fx svg{max-width:26vw;height:auto}          /* keep drawn scenes inside the screen on phones */
+  #fx .p{font-size:min(1em,11vw)}
+}
 </style>
 
 <div id="gate">
@@ -830,12 +834,14 @@ const SCENES={
  de:fx=>{ mkH(fx,SVG_STEIN,'right:7vw;bottom:13vh;transform-origin:bottom center;animation:steinIn 1.1s cubic-bezier(.3,1.3,.5,1) forwards, steinClink 1.1s ease-in-out 1.4s 2');
    for(let i=0;i<11;i++){ setTimeout(()=>{ const s=(5+Math.random()*6|0); mk(fx,'','right:'+(8.5+Math.random()*5).toFixed(1)+'vw;bottom:22vh;width:'+s+'px;height:'+s+'px;animation:bubUp '+(1.2+Math.random()).toFixed(1)+'s ease-out forwards').className='p bub'; },1300+i*150); }
    pop(fx,'🥨','tr',54); },
- it:fx=>{ mkH(fx,'<div class="bob2" style="font-size:42px">🛵</div>','bottom:9vh;left:0;animation:runX 4.4s linear forwards');
+ it:fx=>{ mkH(fx,'<div class="bob2"><span style="display:inline-block;transform:scaleX(-1);font-size:42px">🛵</span></div>','bottom:11vh;left:0;animation:runX 4.4s linear forwards');
    let n=0; const iv=setInterval(()=>{ if(++n>26){clearInterval(iv);return;} const z=(4+Math.random()*6|0);
      const s=mk(fx,'','bottom:10vh;left:'+(n/26*88).toFixed(0)+'vw;width:'+z+'px;height:'+z+'px;animation:bubUp 1.1s ease-out forwards'); s.style.background='rgba(150,150,150,.45)'; s.style.borderRadius='50%'; },155);
    pop(fx,'🍕','br'); },
  tr:fx=>{ mkH(fx,SVG_BALLOON,'right:9vw;bottom:-12vh;animation:riseSway 6.5s ease-in forwards');
-   pop(fx,'🌷','bl'); popAt(fx,'🫖','left:44vw;bottom:9vh',44,0.5); },
+   mkH(fx,'<div style="font-size:58px">🌷</div>','left:8vw;bottom:9vh;transform-origin:bottom center;animation:sunGrow 1.1s cubic-bezier(.2,1.3,.4,1) forwards, flutter 2.6s ease-in-out 1.1s infinite');
+   for(let i=0;i<9;i++){ setTimeout(()=>{ const z=(5+Math.random()*5|0); const s=mk(fx,'','left:'+(43+Math.random()*4).toFixed(1)+'vw;bottom:15vh;width:'+z+'px;height:'+z+'px;animation:bubUp 1.6s ease-out forwards'); s.style.background='rgba(220,220,220,.5)'; s.style.borderRadius='50%'; },500+i*200); }
+   popAt(fx,'🫖','left:44vw;bottom:9vh',44,0.4); },
  uk:fx=>{ mkH(fx,SVG_SUNFLOWER,'left:8vw;bottom:8vh;transform-origin:bottom center;animation:sunGrow 1.2s cubic-bezier(.2,1.3,.4,1) forwards');
    pop(fx,'🌾','br',56,0.3); popAt(fx,'🌾','right:17vw;bottom:8vh',50,0.55); },
  pl:fx=>{ fly(fx,'<div style="font-size:40px">🕊️</div>',{x0:-70,y0:innerHeight*0.2,x1:innerWidth+70,y1:innerHeight*0.15,arc:innerHeight*0.07,spin:0},2600); pop(fx,'🥟','br'); },
@@ -843,11 +849,11 @@ const SCENES={
    let n=0; const iv=setInterval(()=>{ if(++n>14){clearInterval(iv);return;} const z=(6+Math.random()*7|0); const s=mk(fx,'','left:'+(12+Math.random()*4).toFixed(1)+'vw;bottom:19vh;width:'+z+'px;height:'+z+'px;animation:bubUp 1.7s ease-out forwards'); s.style.background='rgba(120,110,102,.5)'; s.style.borderRadius='50%'; },230);
    fly(fx,'<div style="font-size:30px">🦜</div>',{x0:innerWidth+50,y0:innerHeight*0.3,x1:-50,y1:innerHeight*0.22,arc:innerHeight*0.1,spin:0},2800); },
  vi:fx=>{ mkH(fx,SVG_HAT,'right:7vw;bottom:9vh;transform-origin:bottom center;animation:sunGrow 1s cubic-bezier(.2,1.3,.4,1) forwards');
-   mkH(fx,'<div class="bob2" style="font-size:40px">🛵</div>','bottom:9vh;left:0;animation:runX 4.6s linear forwards'); popAt(fx,'🪷','left:44vw;bottom:9vh',44,0.5); },
+   mkH(fx,'<div class="bob2"><span style="display:inline-block;transform:scaleX(-1);font-size:40px">🛵</span></div>','bottom:11vh;left:0;animation:runX 4.6s linear forwards'); popAt(fx,'🪷','left:44vw;bottom:9vh',44,0.5); },
  hi:fx=>{ mkH(fx,SVG_PEACOCK,'right:5vw;bottom:8vh;transform-origin:bottom center;animation:sunGrow 1.1s cubic-bezier(.2,1.3,.4,1) forwards');
    pop(fx,'🪔','bl',44); popAt(fx,'🪔','left:22vw;bottom:8vh',40,0.5); drift(fx,'✨',8); },
  zh:fx=>{ fly(fx,'<div style="font-size:58px">🐉</div>',{x0:-100,y0:innerHeight*0.17,x1:innerWidth+100,y1:innerHeight*0.17,arc:innerHeight*0.06,spin:0},3200);
-   swing(fx,'🏮','tr'); setTimeout(()=>burst(fx,innerWidth*0.5,innerHeight*0.2,{n:14,color:'#ffde00',sz:6}),1500); },
+   pop(fx,'🏮','bl',52); setTimeout(()=>burst(fx,innerWidth*0.5,innerHeight*0.2,{n:14,color:'#ffde00',sz:6}),1500); },
  ja:fx=>{ for(let i=0;i<16;i++) mkH(fx,SVG_PETAL,'top:-6vh;left:'+(Math.random()*100).toFixed(1)+'%;width:'+(12+Math.random()*8|0)+'px;animation:petalDrift '+(6+Math.random()*4).toFixed(1)+'s linear '+(Math.random()*4).toFixed(1)+'s forwards');
    mkH(fx,SVG_TORII,'right:6vw;bottom:13vh;animation:toriiIn 1.2s ease-out .3s forwards'); },
  ko:fx=>{ mkH(fx,SVG_TAEGEUK,'right:7vw;bottom:9vh;transform-origin:center;animation:spinIn 1.1s cubic-bezier(.2,1.2,.4,1) forwards'); drift(fx,'✨',10); pop(fx,'🎏','bl',46); },

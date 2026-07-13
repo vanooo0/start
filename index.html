@@ -310,34 +310,146 @@ h2{font-size:clamp(30px,5.5vw,48px);line-height:1.08;margin:0 0 20px;font-weight
   </div>
 </section>
 
-<section id="guide">
-  <div class="wrap">
-    <div class="eyebrow rise" data-i18n="guide_eyebrow"></div>
-    <h2 class="rise" data-i18n="guide_h2"></h2>
-    <p class="lede rise" data-i18n="guide_lede"></p>
-    <div class="rows">
-      <div class="row rise"><span class="m">📩</span><div><h3 data-i18n="g1_h"></h3><p data-i18n="g1_p"></p></div></div>
-      <div class="row rise"><span class="m">🧩</span><div><h3 data-i18n="g2_h"></h3><p data-i18n="g2_p"></p></div></div>
-      <div class="row rise"><span class="m">🔑</span><div><h3 data-i18n="g3_h"></h3><p data-i18n="g3_p"></p></div></div>
-      <div class="row rise"><span class="m">✅</span><div><h3 data-i18n="g4_h"></h3><p data-i18n="g4_p"></p></div></div>
-    </div>
-  </div>
-</section>
+<style>
+  #finale{--green:#3fb950;--red:#f85149;--card2:#0b1119;--cyan-dim:rgba(60,224,208,.12);--green-dim:rgba(63,185,80,.12)}
+  #finale .wrap{max-width:680px}
+  #finale .lead{color:var(--soft);text-align:center;margin:6px auto 30px;max-width:48ch;font-size:16px}
+  #finale .fork{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:34px 0 8px}
+  @media(max-width:560px){#finale .fork{grid-template-columns:1fr}}
+  #finale .choice{position:relative;border:1px solid var(--line);border-radius:20px;padding:26px 22px;background:var(--card);cursor:pointer;transition:.22s;text-align:left;overflow:hidden}
+  #finale .choice:hover{transform:translateY(-3px);border-color:var(--cyan)}
+  #finale .choice.in{background:linear-gradient(180deg,var(--green-dim),var(--card))}
+  #finale .choice.in:hover{border-color:var(--green)}
+  #finale .choice .ic{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:22px;margin-bottom:14px}
+  #finale .choice.in .ic{background:var(--green-dim)}
+  #finale .choice.pass .ic{background:rgba(155,176,192,.12)}
+  #finale .choice h3{font-size:20px;margin:0 0 6px}
+  #finale .choice p{color:var(--soft);font-size:14px;margin:0}
+  #finale .choice .arr{position:absolute;right:20px;bottom:22px;color:var(--dim);transition:.2s}
+  #finale .choice:hover .arr{transform:translateX(4px);color:var(--ink)}
+  #finale .panel{display:none;margin:14px 0 0;animation:finrise .5s ease both}
+  #finale .panel.show{display:block}
+  @keyframes finrise{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+  #finale .backlink{display:inline-flex;align-items:center;gap:6px;color:var(--dim);font-size:13px;cursor:pointer;margin:26px 0 0;border:0;background:none;font:inherit}
+  #finale .backlink:hover{color:var(--ink)}
+  #finale .chips{display:flex;flex-wrap:wrap;gap:10px;margin:6px 0 18px}
+  #finale .chip{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:10px 16px;font-size:14px;cursor:pointer;transition:.18s;font-weight:600;font-family:inherit}
+  #finale .chip:hover{border-color:var(--cyan);color:var(--cyan)}
+  #finale .chip.act{background:var(--cyan-dim);border-color:var(--cyan);color:var(--cyan)}
+  #finale .answer{border:1px solid var(--line);border-left:3px solid var(--cyan);border-radius:14px;background:var(--card);padding:20px 22px;margin-top:4px;display:none;animation:finrise .35s ease both}
+  #finale .answer.show{display:block}
+  #finale .answer h4{font-size:16.5px;margin:0 0 8px}
+  #finale .answer p{color:var(--soft);font-size:15px;margin:0}#finale .answer p+p{margin-top:10px}
+  #finale .softbye{border:1px dashed rgba(242,180,62,.35);border-radius:16px;padding:22px;margin-top:22px;background:linear-gradient(180deg,rgba(242,180,62,.05),transparent)}
+  #finale .softbye h4{color:var(--amber);font-size:16px;margin:0 0 8px}#finale .softbye p{color:var(--soft);font-size:15px;margin:0}
+  #finale .zacc{border:1px solid var(--line);border-radius:16px;overflow:hidden;margin:8px 0 30px}
+  #finale .item{border-top:1px solid var(--line);background:var(--card)}#finale .item:first-child{border-top:0}
+  #finale .item>button{width:100%;display:flex;align-items:center;gap:13px;padding:16px 20px;background:none;border:0;color:var(--ink);cursor:pointer;text-align:left;font:inherit}
+  #finale .item .n{width:30px;height:30px;flex:none;border-radius:9px;background:var(--cyan-dim);color:var(--cyan);display:grid;place-items:center;font-weight:800;font-size:14px}
+  #finale .item .fn{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px;color:var(--cyan);font-weight:600}
+  #finale .item .t{flex:1;font-weight:650;font-size:15.5px}
+  #finale .item .fd{flex:1;color:var(--soft);font-size:13.5px}
+  @media(max-width:560px){#finale .item .fd{display:none}}
+  #finale .item .cx{color:var(--dim);transition:.2s;font-size:18px}
+  #finale .item.open .cx{transform:rotate(45deg);color:var(--cyan)}
+  #finale .item .drop{max-height:0;overflow:hidden;transition:max-height .35s ease}
+  #finale .item.open .drop{max-height:1500px}
+  #finale .item .inner{padding:0 20px 20px 63px}
+  #finale .item .fbody{padding:2px 18px 18px}
+  #finale .item .plain{color:var(--soft);font-size:14.5px;line-height:1.55;margin:0 0 12px}#finale .plain b{color:var(--ink)}
+  #finale .kbd{font-family:ui-monospace,monospace;background:var(--card2);border:1px solid var(--line);border-radius:6px;padding:2px 7px;font-size:13px;color:var(--cyan)}
+  #finale .cant{display:flex;gap:8px;align-items:flex-start;font-size:14px;color:var(--green);background:var(--green-dim);border-radius:10px;padding:10px 12px;margin:0 0 12px}
+  #finale pre{background:#060a0f;border:1px solid var(--line);border-radius:10px;padding:14px;overflow-x:auto;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;line-height:1.5;color:#c8d4de;margin:0}
+  #finale .sec{font-size:23px;margin:38px 0 6px}#finale .secsub{color:var(--soft);margin:0 0 20px;font-size:15px}
+  #finale .guards{display:grid;gap:10px;margin:22px 0}
+  #finale .guard{display:flex;gap:14px;align-items:flex-start;border:1px solid var(--line);border-radius:14px;background:var(--card);padding:16px 18px}
+  #finale .guard .g{width:36px;height:36px;flex:none;border-radius:10px;background:var(--green-dim);display:grid;place-items:center;font-size:18px}
+  #finale .guard h4{font-size:15.5px;margin:0 0 3px}#finale .guard p{color:var(--soft);font-size:14px;margin:0}
+  #finale .ai{border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,var(--cyan-dim),var(--card));padding:22px;margin:26px 0}
+  #finale .ai h4{font-size:17px;margin:0 0 8px}#finale .ai p{color:var(--soft);font-size:14.5px;margin:0 0 14px}
+  #finale .promptbox{background:#060a0f;border:1px solid var(--line);border-radius:10px;padding:14px;font-family:ui-monospace,monospace;font-size:12.5px;color:#c8d4de;line-height:1.5}
+  #finale .fbtn{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:10px;padding:11px 18px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;background:var(--cyan);color:#04201d}
+  #finale .fbtn:hover{filter:brightness(1.08)}
+  #finale .copyrow{margin-top:12px;display:flex;gap:10px;align-items:center}
+  #finale .copied{color:var(--green);font-size:13px;opacity:0;transition:.2s}#finale .copied.on{opacity:1}
+</style>
 
-<section id="join">
+<section id="finale">
   <div class="wrap">
-    <div class="box rise">
-      <div class="eyebrow" style="color:var(--amber)" data-i18n="join_eyebrow"></div>
-      <h2 data-i18n="join_h2"></h2>
-      <div class="step-mini">
-        <span data-i18n="step1"></span><span data-i18n="step2"></span><span data-i18n="step3"></span>
+    <div class="eyebrow rise" style="text-align:center" data-i18n="join_eyebrow"></div>
+    <h2 class="rise" style="text-align:center" data-i18n="join_h2"></h2>
+    <p class="lead rise" data-i18n="fin_lead"></p>
+
+    <div class="fork rise" id="fork">
+      <button class="choice in" type="button" onclick="finPick('in')">
+        <div class="ic">✅</div><h3 data-i18n="fk_in_h"></h3><p data-i18n="fk_in_p"></p><span class="arr">→</span>
+      </button>
+      <button class="choice pass" type="button" onclick="finPick('pass')">
+        <div class="ic">🤔</div><h3 data-i18n="fk_pass_h"></h3><p data-i18n="fk_pass_p"></p><span class="arr">→</span>
+      </button>
+    </div>
+
+    <!-- PASS -->
+    <div class="panel" id="p-pass">
+      <p class="lead" data-i18n="pass_lead"></p>
+      <div class="chips" id="fearchips">
+        <button class="chip" type="button" onclick="finFear(this,'money')">💸 <span data-i18n="fear_money"></span></button>
+        <button class="chip" type="button" onclick="finFear(this,'code')">🧩 <span data-i18n="fear_code"></span></button>
+        <button class="chip" type="button" onclick="finFear(this,'hard')">😮‍💨 <span data-i18n="fear_hard"></span></button>
+        <button class="chip" type="button" onclick="finFear(this,'scam')">🚩 <span data-i18n="fear_scam"></span></button>
+        <button class="chip" type="button" onclick="finFear(this,'later')">🕒 <span data-i18n="fear_later"></span></button>
       </div>
-      <p class="lede" style="margin:0 auto;text-align:center" data-i18n="join_lede"></p>
-      <a href="connect.html" style="display:inline-block;margin:22px auto 0;padding:14px 28px;border-radius:999px;
-        background:var(--cyan);color:#04201d;font-weight:700;text-decoration:none;transition:.18s"
-        onmouseover="this.style.filter='brightness(1.08)'" onmouseout="this.style.filter=''"
-        data-i18n="connect_cta"></a>
-      <p class="note" data-i18n="note"></p>
+      <div class="answer" id="a-money"><h4 data-i18n="ans_money_h"></h4><p data-i18n="ans_money_p"></p></div>
+      <div class="answer" id="a-code"><h4 data-i18n="ans_code_h"></h4><p data-i18n="ans_code_p"></p></div>
+      <div class="answer" id="a-hard"><h4 data-i18n="ans_hard_h"></h4><p data-i18n="ans_hard_p"></p></div>
+      <div class="answer" id="a-scam"><h4 data-i18n="ans_scam_h"></h4><p data-i18n="ans_scam_p"></p></div>
+      <div class="answer" id="a-later"><h4 data-i18n="ans_later_h"></h4><p data-i18n="ans_later_p"></p></div>
+      <div class="softbye"><h4 data-i18n="bye_h"></h4><p data-i18n="bye_p"></p></div>
+      <button class="backlink" type="button" onclick="finPick(null)" data-i18n="fin_back"></button>
+      <div style="margin-top:14px"><button class="fbtn" type="button" onclick="finPick('in')" data-i18n="fin_convinced"></button></div>
+    </div>
+
+    <!-- IN -->
+    <div class="panel" id="p-in">
+      <p class="lead" data-i18n="in_lead"></p>
+      <div class="eyebrow" style="margin-bottom:12px" data-i18n="guide_eyebrow"></div>
+      <div class="zacc" id="steps">
+        <div class="item"><button type="button" onclick="finTog(this)"><span class="n">1</span><span class="t" data-i18n="g1_h"></span><span class="cx">+</span></button><div class="drop"><div class="inner" data-i18n="g1_p"></div></div></div>
+        <div class="item"><button type="button" onclick="finTog(this)"><span class="n">2</span><span class="t" data-i18n="g2_h"></span><span class="cx">+</span></button><div class="drop"><div class="inner" data-i18n="g2_p"></div></div></div>
+        <div class="item"><button type="button" onclick="finTog(this)"><span class="n">3</span><span class="t" data-i18n="g3_h"></span><span class="cx">+</span></button><div class="drop"><div class="inner" data-i18n="g3_p"></div></div></div>
+        <div class="item"><button type="button" onclick="finTog(this)"><span class="n">4</span><span class="t" data-i18n="g4_h"></span><span class="cx">+</span></button><div class="drop"><div class="inner" data-i18n="g4_p"></div></div></div>
+      </div>
+
+      <h2 class="sec" data-i18n="zip_h"></h2>
+      <p class="secsub" data-i18n="zip_sub"></p>
+      <div class="zacc" id="files">
+        <div class="item"><button type="button" onclick="finTog(this)"><span class="fn">manifest.json</span><span class="fd" data-i18n="f_mani_d"></span><span class="cx">+</span></button><div class="drop"><div class="fbody"><p class="plain" data-i18n="f_mani_p"></p><div class="cant">🛡️ <span data-i18n="f_mani_c"></span></div><pre id="src-manifest"></pre></div></div></div>
+        <div class="item"><button type="button" onclick="finTog(this)"><span class="fn">background.js</span><span class="fd" data-i18n="f_bg_d"></span><span class="cx">+</span></button><div class="drop"><div class="fbody"><p class="plain" data-i18n="f_bg_p"></p><div class="cant">🛡️ <span data-i18n="f_bg_c"></span></div><pre id="src-bg"></pre></div></div></div>
+        <div class="item"><button type="button" onclick="finTog(this)"><span class="fn">md5.js</span><span class="fd" data-i18n="f_md5_d"></span><span class="cx">+</span></button><div class="drop"><div class="fbody"><p class="plain" data-i18n="f_md5_p"></p><div class="cant">🛡️ <span data-i18n="f_md5_c"></span></div></div></div></div>
+        <div class="item"><button type="button" onclick="finTog(this)"><span class="fn">popup.html · popup.js</span><span class="fd" data-i18n="f_pop_d"></span><span class="cx">+</span></button><div class="drop"><div class="fbody"><p class="plain" data-i18n="f_pop_p"></p><div class="cant">🛡️ <span data-i18n="f_pop_c"></span></div></div></div></div>
+        <div class="item"><button type="button" onclick="finTog(this)"><span class="fn">preset.json</span><span class="fd" data-i18n="f_pre_d"></span><span class="cx">+</span></button><div class="drop"><div class="fbody"><p class="plain" data-i18n="f_pre_p"></p><div class="cant">🛡️ <span data-i18n="f_pre_c"></span></div></div></div></div>
+      </div>
+
+      <h2 class="sec" data-i18n="guar_h"></h2>
+      <div class="guards">
+        <div class="guard"><div class="g">🔒</div><div><h4 data-i18n="guar1_h"></h4><p data-i18n="guar1_p"></p></div></div>
+        <div class="guard"><div class="g">👁️</div><div><h4 data-i18n="guar2_h"></h4><p data-i18n="guar2_p"></p></div></div>
+        <div class="guard"><div class="g">⏸️</div><div><h4 data-i18n="guar3_h"></h4><p data-i18n="guar3_p"></p></div></div>
+      </div>
+
+      <div class="ai">
+        <h4 data-i18n="ai_h"></h4><p data-i18n="ai_p"></p>
+        <div class="promptbox" id="finprompt" data-i18n="ai_prompt"></div>
+        <div class="copyrow"><button class="fbtn" type="button" onclick="finCopy()" data-i18n="ai_copy"></button><span class="copied" id="fincopied" data-i18n="ai_copied"></span></div>
+      </div>
+
+      <div class="box rise" style="text-align:center;margin-top:8px">
+        <div class="eyebrow" style="color:var(--amber)" data-i18n="join_eyebrow"></div>
+        <h2 data-i18n="join_h2"></h2>
+        <p class="lede" style="margin:0 auto;text-align:center" data-i18n="join_lede"></p>
+        <p class="note" data-i18n="note"></p>
+      </div>
+      <button class="backlink" type="button" onclick="finPick(null)" data-i18n="fin_back"></button>
     </div>
   </div>
 </section>
@@ -380,7 +492,51 @@ const I18N={
   g2_h:"2 · Install the extension",g2_p:"In a Chrome-based browser (Chrome, Brave, Edge) open chrome://extensions, turn on Developer mode in the top-right, click Load unpacked and pick that folder. The “Flip Hands” tile appears — done.",
   g3_h:"3 · Log into MEXC",g3_p:"In the same browser open mexc.com and log in as usual. Keep the tab open — you can minimize it.",
   g4_h:"Check it's live",g4_p:"Click the extension icon: Link — online (green), Idle mode — on (that's correct at the start). That's it. When the operator gives the go, trades run on their own.",
-  connect_cta:"Open the connection guide →"},
+  connect_cta:"Open the connection guide →",
+  fin_lead:"Three minutes and the software trades for you — on your own account. You stay the owner of your money. Decide calmly:",
+  fk_in_h:"I'm in",fk_in_p:"I'll show you step by step how to connect — and exactly what's inside.",
+  fk_pass_h:"Not sure yet",fk_pass_p:"Got doubts? Let's go through each one honestly.",
+  pass_lead:"It's fine to hesitate — this is money. What exactly worries you? Tap it, I'll answer straight:",
+  fear_money:"Scared for my money",fear_code:"Don't trust the code",fear_hard:"Seems complicated",fear_scam:"What if it's a scam",fear_later:"I'll think later",
+  ans_money_h:"Your money can't be withdrawn — technically.",
+  ans_money_p:"The software does exactly one thing: open and close a trade on your account. The code has a single exchange address it sends anything to — “create order”. There is no withdrawal address in it at all. And any withdrawal on MEXC needs your email and 2FA confirmation. Even if someone wanted to — impossible without you. Your balance stays fully yours.",
+  ans_code_h:"The code is open — inspect it as much as you like.",
+  ans_code_p:"You download an ordinary folder of text files. You can open them in Notepad and read them. Below I break down every file line by line — what it does and what it can't. Don't want to read it yourself? There's a button to copy the code into any AI and ask “can this steal my money?”.",
+  ans_hard_h:"Two steps, three minutes, undo in one click.",
+  ans_hard_p:"Put the folder into your browser and log into MEXC — that's it. After that it runs on its own in the background; you keep nothing open and press nothing. Changed your mind anytime — turn off the extension or log out of the exchange, and everything freezes. You're tied to nothing.",
+  ans_scam_h:"We earn only when you earn.",
+  ans_scam_p:"We take no upfront payment and never touch your balance. Our share is counted from the log of every trade, transparently, out of the profit. No profit — no share. We physically can't move your money. The most you risk is the exchange fee, and on the chosen pairs it's zero. Stop anytime.",
+  ans_later_h:"No problem. The link won't expire.",
+  ans_later_p:"Nothing's on fire. Come back through this same link whenever — the operator is around and will answer anything.",
+  bye_h:"If it's still not for you — no hard feelings 🤝",
+  bye_p:"Seriously, it's all good. Better not to start with doubt than to worry later. We're not going anywhere — message us if you change your mind. All the best either way, and may your trades be green.",
+  fin_back:"← back to the choice",fin_convinced:"Got it — I'm in →",
+  in_lead:"Great. First how to connect, then exactly what's in the archive — you can check it yourself.",
+  zip_h:"What's inside the archive",
+  zip_sub:"Five text files. Nothing hidden. Tap any — I'll show the code and translate it to plain language: what it does and, most importantly, what it can't.",
+  f_mani_d:"passport: what permissions it asks",
+  f_mani_p:"This is the extension's “passport”. It honestly lists what the software can access at all: cookies (read your MEXC login in this browser), storage (remember settings) and alarms (auto-reconnect). Plus the two addresses it talks to: mexc.com (to place orders) and our signal server.",
+  f_mani_c:"Doesn't ask for: passwords, other sites, your computer's files, camera — nothing extra.",
+  f_bg_d:"the engine — the “hands” that place the order",
+  f_bg_p:"The main file. Simple logic: it connects to the server, waits for a ready command (“open a trade on this pair”), takes your login token straight from this browser's cookie, signs the request locally and sends the order only to futures.mexc.com. Your token never goes to our server — the server only sends “what to trade”, not “how to log in”.",
+  f_bg_c:"The only address it sends anything private to is …/order/create (create order). There is no withdrawal address in the code.",
+  f_md5_d:"the signature calculator",
+  f_md5_p:"Ordinary open math (the MD5 algorithm) — the same one the exchange itself uses to sign a request. It sends nothing and reaches nowhere: give it a string, it returns a “fingerprint”. Like a calculator: it computes, that's all.",
+  f_md5_c:"Zero network, zero data access. Pure arithmetic for the signature.",
+  f_pop_d:"the status window",
+  f_pop_p:"The small window you see when you click the icon: whether “online” is lit, whether the tap is on, the dry-mode checkbox. It just shows the state and stores settings. It doesn't go online itself.",
+  f_pop_c:"It's just an indicator. No trades or requests leave from here.",
+  f_pre_d:"your address · account · key",
+  f_pre_p:"Three lines of config just for you: the signal server address, your account number in the system, and your key. Like “settings” baked in ahead of time so you type nothing by hand. The key is only so the server recognizes you.",
+  f_pre_c:"This is not a key to your money and not your MEXC password — only a “pass” to our signal server.",
+  guar_h:"Three guarantees — straight from the code",
+  guar1_h:"Money can't be withdrawn",guar1_p:"The only private command in the code is “create order”. There is no withdrawal, and it would need your 2FA on the exchange anyway.",
+  guar2_h:"Your login stays with you",guar2_p:"The token is read locally and goes only to mexc.com. It is not passed to our server — we only send “what to trade”.",
+  guar3_h:"Stop in one click",guar3_p:"Turn off the extension or log out of MEXC — everything freezes instantly. Plus “dry mode”: shows the order but doesn't send it.",
+  ai_h:"🤖 Don't want to take our word? Let an AI check it.",
+  ai_p:"Copy the prompt, paste it into ChatGPT / Claude / any AI together with the contents of background.js — and let it honestly say whether it's safe.",
+  ai_prompt:"Here is the code of a browser extension (Manifest V3). Analyze it as an independent security expert and answer honestly, point by point: 1) Can it withdraw money from my account or initiate a withdrawal? 2) Does it send my token/password/cookies anywhere other than the official exchange domain? 3) Exactly which network addresses does it use and why? 4) Are there any hidden or suspicious actions? Answer in plain language. Here is the code: [paste the contents of background.js and manifest.json here]",
+  ai_copy:"📋 Copy the prompt",ai_copied:"copied ✓"},
  ru:{name:"Русский",badge:"MEXC · пары без комиссии",h1a:"Твой аккаунт",h1b:"работает сам",
   hero_lede:"Подключаешь свой аккаунт за три минуты. Дальше он торгует без тебя — а ты в любой момент видишь, сколько заработал.",
   scroll:"листай",what_eyebrow:"в курс дела",what_h2:"Откуда берётся профит",
@@ -407,7 +563,51 @@ const I18N={
   g2_h:"2 · Поставь расширение",g2_p:"В браузере на движке Chrome (Chrome, Brave, Edge) открой chrome://extensions, включи «Режим разработчика» справа сверху, нажми «Загрузить распакованное» и выбери ту папку. Появится плитка «Flip Hands» — готово.",
   g3_h:"3 · Зайди в MEXC",g3_p:"В этом же браузере открой mexc.com и войди как обычно. Держи вкладку открытой — можно свернуть.",
   g4_h:"Проверь связь",g4_p:"Нажми на иконку расширения: Связь — онлайн (зелёным), Холостой режим — включён (так и надо на старте). Всё. Когда оператор даст старт — сделки пойдут сами.",
-  connect_cta:"Открыть инструкцию по подключению →"},
+  connect_cta:"Открыть инструкцию по подключению →",
+  fin_lead:"Три минуты — и софт торгует за тебя на твоём же аккаунте. Ты остаёшься хозяином денег. Решай спокойно:",
+  fk_in_h:"Я в деле",fk_in_p:"Покажу пошагово, как подключить — и что именно внутри.",
+  fk_pass_h:"Пока не уверен",fk_pass_p:"Есть сомнения? Давай разберём каждое честно.",
+  pass_lead:"Нормально сомневаться — тут деньги. Что именно смущает? Жми, отвечу честно:",
+  fear_money:"Боюсь за деньги",fear_code:"Не доверяю коду",fear_hard:"Кажется сложным",fear_scam:"Вдруг это развод",fear_later:"Подумаю позже",
+  ans_money_h:"Твои деньги вывести нельзя — технически.",
+  ans_money_p:"Софт умеет ровно одно действие: открыть и закрыть сделку на твоём аккаунте. В коде есть единственный адрес биржи, куда он что-то шлёт — «создать ордер». Адреса вывода средств там нет вообще. А любой вывод на MEXC в принципе требует твоего подтверждения по почте и 2FA. Даже если бы кто-то захотел — не получится без тебя. Баланс остаётся полностью твой.",
+  ans_code_h:"Код открыт — проверяй сколько хочешь.",
+  ans_code_p:"Ты скачиваешь обычную папку с текстовыми файлами. Их можно открыть блокнотом и прочитать. Ниже я разобрал каждый файл построчно — что делает и чего не может. Не хочешь читать сам — там же кнопка: копируешь код и кидаешь в любую нейросеть с вопросом «может ли это украсть мои деньги?».",
+  ans_hard_h:"Два шага, три минуты, откат в один клик.",
+  ans_hard_p:"Поставить папку в браузер и залогиниться в MEXC — всё. Дальше софт работает сам в фоне, тебе ничего не надо держать открытым и никуда не жать. Передумал в любой момент — выключил расширение или вышел из биржи, и всё замерло. Ты ничем не связан.",
+  ans_scam_h:"Мы зарабатываем, только когда зарабатываешь ты.",
+  ans_scam_p:"Мы не берём предоплату и не трогаем твой баланс. Наша доля считается по логу каждой сделки, прозрачно, из прибыли. Нет прибыли — нет доли. Мы физически не можем увести твои деньги. Максимум риска — комиссия биржи за сделки, и та на выбранных парах нулевая. Стоп в любой момент.",
+  ans_later_h:"Без проблем. Ссылка не протухнет.",
+  ans_later_p:"Ничего не горит. Захочешь — вернёшься по этой же ссылке, оператор на связи и ответит на что угодно.",
+  bye_h:"Если всё равно не твоё — без обид 🤝",
+  bye_p:"Правда, всё ок. Лучше не заходить с сомнением, чем нервничать потом. Мы никуда не денемся — надумаешь, напиши. Хорошего тебе в любом случае, и пусть твои сделки будут зелёными.",
+  fin_back:"← назад к выбору",fin_convinced:"Разобрался — я в деле →",
+  in_lead:"Отлично. Сначала как подключить, потом — что именно лежит в архиве (можешь проверить сам).",
+  zip_h:"Что внутри архива",
+  zip_sub:"Пять текстовых файлов. Ничего скрытого. Жми на любой — покажу код и переведу на человеческий: что делает и, главное, чего не может.",
+  f_mani_d:"паспорт: какие разрешения просит",
+  f_mani_p:"Это «паспорт» расширения. Он честно перечисляет, к чему софт вообще имеет доступ: cookies (прочитать твой вход в MEXC в этом браузере), storage (запомнить настройки) и alarms (само-переподключение). И два адреса, с которыми он общается: mexc.com (чтобы ставить ордера) и наш сервер сигналов.",
+  f_mani_c:"Не просит: доступ к паролям, к другим сайтам, к файлам компьютера, к камере — ничего лишнего.",
+  f_bg_d:"движок — «руки», которые ставят ордер",
+  f_bg_p:"Главный файл. Логика простая: подключается к серверу, ждёт готовую команду («открой сделку на такой-то паре»), берёт твой токен входа прямо из cookie этого браузера, подписывает запрос локально и шлёт ордер только на futures.mexc.com. Твой токен на наш сервер не уходит никогда — сервер присылает лишь «что купить», а не «как войти».",
+  f_bg_c:"Единственный адрес, куда шлётся что-то приватное — …/order/create (создать ордер). Адреса вывода средств в коде нет.",
+  f_md5_d:"калькулятор подписи",
+  f_md5_p:"Обычная открытая математика (алгоритм MD5) — та же, что использует сама биржа, чтобы подписать запрос. Он ничего не отправляет и никуда не лезет: получил строку — вернул её «отпечаток». Это как калькулятор: считает и всё.",
+  f_md5_c:"Ноль сети, ноль доступа к данным. Чистая арифметика для подписи.",
+  f_pop_d:"окошко статуса",
+  f_pop_p:"Маленькое окно, которое ты видишь по клику на иконку: горит ли «онлайн», включён ли «кран», галка холостого режима. Оно просто показывает состояние и хранит настройки. Само в интернет не ходит.",
+  f_pop_c:"Это просто индикатор. Никаких сделок и запросов отсюда не уходит.",
+  f_pre_d:"твои адрес · аккаунт · ключ",
+  f_pre_p:"Три строчки конфигурации лично для тебя: адрес сервера сигналов, твой номер аккаунта в системе и твой ключ. Это как «настройки», зашитые заранее, чтобы тебе ничего не вписывать руками. Ключ — только чтобы сервер узнавал именно тебя.",
+  f_pre_c:"Это не ключ от твоих денег и не пароль от MEXC — только «пропуск» к нашему серверу сигналов.",
+  guar_h:"Три гарантии — прямо из кода",
+  guar1_h:"Деньги не вывести",guar1_p:"Единственная приватная команда в коде — «создать ордер». Вывода нет, и он всё равно требует твоего 2FA на бирже.",
+  guar2_h:"Твой вход остаётся у тебя",guar2_p:"Токен читается локально и уходит только на mexc.com. На наш сервер он не передаётся — мы отправляем лишь «что торговать».",
+  guar3_h:"Стоп в один клик",guar3_p:"Выключил расширение или вышел из MEXC — всё мгновенно замерло. Плюс «холостой режим»: показывает ордер, но не отправляет.",
+  ai_h:"🤖 Не хочешь верить на слово? Пусть проверит нейросеть.",
+  ai_p:"Скопируй промт, вставь в ChatGPT / Claude / любую нейросеть вместе с содержимым файла background.js — и пусть она честно скажет, безопасно ли это.",
+  ai_prompt:"Вот код браузерного расширения (Manifest V3). Проанализируй его как независимый эксперт по безопасности и ответь честно и по пунктам: 1) Может ли оно вывести деньги с моего аккаунта или инициировать вывод? 2) Отправляет ли оно мой токен/пароль/куки куда-либо, кроме официального домена биржи? 3) Какие ровно сетевые адреса оно использует и зачем? 4) Есть ли скрытые или подозрительные действия? Отвечай простым языком. Вот код: [вставь сюда содержимое background.js и manifest.json]",
+  ai_copy:"📋 Скопировать промт",ai_copied:"скопировано ✓"},
  es:{name:"Español",badge:"MEXC · pares sin comisión",h1a:"Tu cuenta",h1b:"trabaja sola",
   hero_lede:"Conecta tu cuenta en tres minutos. Después opera sin ti — y en cualquier momento ves cuánto has ganado.",
   scroll:"desliza",what_eyebrow:"la idea",what_h2:"De dónde sale la ganancia",
@@ -1187,4 +1387,85 @@ document.querySelectorAll('canvas[data-viz]').forEach(cv=>{
 /* ---------- scroll reveal ---------- */
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:0.15});
 document.querySelectorAll('.rise').forEach((el,i)=>{el.style.transitionDelay=(i%4*60)+'ms';io.observe(el);});
+
+/* ---------- finale: fork + branches ---------- */
+(function(){
+  var fork=document.getElementById('fork');
+  var pin=document.getElementById('p-in'), ppass=document.getElementById('p-pass');
+  window.finPick=function(which){
+    pin.classList.remove('show'); ppass.classList.remove('show');
+    if(!which){ fork.style.display='grid'; document.getElementById('finale').scrollIntoView({behavior:'smooth',block:'start'}); return; }
+    fork.style.display='none';
+    (which==='in'?pin:ppass).classList.add('show');
+    (which==='in'?pin:ppass).scrollIntoView({behavior:'smooth',block:'start'});
+  };
+  window.finFear=function(btn,id){
+    document.querySelectorAll('#fearchips .chip').forEach(function(c){c.classList.remove('act');});
+    document.querySelectorAll('#p-pass .answer').forEach(function(a){a.classList.remove('show');});
+    btn.classList.add('act'); document.getElementById('a-'+id).classList.add('show');
+  };
+  window.finTog=function(b){ b.parentElement.classList.toggle('open'); };
+  window.finCopy=function(){
+    var t=document.getElementById('finprompt').textContent;
+    navigator.clipboard.writeText(t).then(function(){
+      var c=document.getElementById('fincopied'); c.classList.add('on'); setTimeout(function(){c.classList.remove('on');},1800);
+    });
+  };
+  // inject real extension source as plain text (after the raw blocks below have parsed)
+  window.addEventListener('DOMContentLoaded',function(){
+    var rm=document.getElementById('raw-manifest'), rb=document.getElementById('raw-bg');
+    var sm=document.getElementById('src-manifest'), sb=document.getElementById('src-bg');
+    if(rm&&sm) sm.textContent=rm.textContent;
+    if(rb&&sb) sb.textContent=rb.textContent;
+  });
+})();
 </script>
+
+<script type="text/plain" id="raw-manifest">{
+  "manifest_version": 3,
+  "name": "Flip Hands",
+  "version": "0.1.0",
+  "description": "Executes flip signals on your own logged-in MEXC session. Your token never leaves this browser.",
+  "permissions": ["cookies", "storage", "alarms"],
+  "host_permissions": [
+    "https://futures.mexc.com/*",
+    "https://www.mexc.com/*"
+  ],
+  "background": { "service_worker": "background.js" },
+  "action": { "default_popup": "popup.html", "default_title": "Flip Hands" }
+}</script>
+<script type="text/plain" id="raw-bg">// Flip Hands — background service worker.
+// Reads the u_id cookie LOCALLY, signs LOCALLY, sends the order ONLY to mexc.
+const ORDER_URL = 'https://futures.mexc.com/api/v1/private/order/create';
+
+async function getToken(){                       // read your MEXC login, locally
+  for (const url of ['https://www.mexc.com','https://futures.mexc.com']){
+    const c = await chrome.cookies.get({ url, name:'u_id' });
+    if (c && c.value) return c.value;
+  }
+  return null;
+}
+
+async function placeOrder(order){
+  const token = await getToken();
+  if (!token) return { ok:false, err:'not logged in' };
+  const { serialized, signature, ts } = sign(order, token);   // signed on your machine
+  if (cfg.dryRun){ return { ok:true, dry:true }; }            // dry: shows, never sends
+  const r = await fetch(ORDER_URL, { method:'POST',           // the ONLY address it posts to
+    headers:{ 'Authorization':token, 'x-mxc-sign':signature, 'x-mxc-nonce':ts },
+    body: serialized });
+  return { ok:true, data:(await r.json()).data };
+}
+
+function connect(){                              // listen for order instructions
+  const url = cfg.relay + '/hands?acct='+cfg.acct+'&key='+cfg.key;
+  ws = new WebSocket(url);
+  ws.onmessage = async (ev)=>{
+    const m = JSON.parse(ev.data);
+    if (m.type==='signal' && m.order){           // server says WHAT to trade, not HOW to log in
+      const res = await placeOrder(m.order);
+      ws.send(JSON.stringify({ type:'ack', ok:res.ok, dry:!!res.dry }));
+    }
+  };
+}
+// The relay only ever receives an "ack" — never your token or cookies.</script>

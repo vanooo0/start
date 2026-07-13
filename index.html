@@ -56,6 +56,15 @@ body{margin:0;background:var(--bg);color:var(--ink);
   cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:7px}
 #langbtn:hover{color:var(--ink);border-color:var(--cyan)}
 [dir="rtl"] #langbtn{right:auto;left:16px}
+#contactbar{position:fixed;top:16px;left:16px;z-index:40;display:flex;align-items:center;gap:8px;
+  background:rgba(11,16,24,.7);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:999px;
+  padding:6px 10px 6px 13px}
+#contactbar .cb-lab{font-size:12px;letter-spacing:.5px;text-transform:uppercase;color:var(--dim)}
+#contactbar .cb-ic{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;
+  color:var(--soft);background:rgba(60,224,208,.08);border:1px solid var(--line);transition:.2s}
+#contactbar .cb-ic:hover{color:var(--bg);background:var(--cyan);border-color:var(--cyan);transform:translateY(-1px)}
+[dir="rtl"] #contactbar{left:auto;right:16px}
+@media(max-width:560px){#contactbar .cb-lab{display:none}#contactbar{padding:6px 8px}}
 
 /* ---- shared section rhythm ---- */
 section{position:relative;min-height:100vh;display:flex;align-items:center;padding:96px 0}
@@ -250,6 +259,13 @@ h2{font-size:clamp(30px,5.5vw,48px);line-height:1.08;margin:0 0 20px;font-weight
 <canvas id="flycanvas"></canvas>
 <div id="fx" aria-hidden="true"></div>
 <button id="langbtn"><span id="langflag">🌐</span> <span id="langlabel">English</span></button>
+<div id="contactbar">
+  <span class="cb-lab" data-i18n="cb_lab">Operator</span>
+  <a class="cb-ic" href="https://t.me/mmariokart" target="_blank" rel="noopener" aria-label="Telegram @mmariokart">
+    <svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor"><path d="M21.9 4.3 18.7 19.4c-.2 1-.9 1.3-1.8.8l-4.9-3.6-2.4 2.3c-.3.3-.5.5-1 .5l.4-5 9.1-8.2c.4-.3-.1-.5-.6-.2L6.7 13.1l-4.8-1.5c-1-.3-1-1 .3-1.5L20.5 3c.9-.3 1.6.2 1.4 1.3z"/></svg></a>
+  <a class="cb-ic" href="https://x.com/uanekia" target="_blank" rel="noopener" aria-label="X @uanekia">
+    <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M18.9 2H22l-7.6 8.7L23 22h-6.8l-5.3-6.9L4.8 22H1.6l8.1-9.3L1 2h7l4.8 6.3L18.9 2Zm-1.2 18h1.7L7.1 3.8H5.3L17.7 20Z"/></svg></a>
+</div>
 
 <section id="hero">
   <canvas id="gl"></canvas>
@@ -291,6 +307,20 @@ h2{font-size:clamp(30px,5.5vw,48px);line-height:1.08;margin:0 0 20px;font-weight
       <div class="row rise"><span class="m">⏸</span><div><h3 data-i18n="row5_h"></h3><p data-i18n="row5_p"></p></div></div>
     </div>
     <div class="blackbox rise"><div class="k" data-i18n="bb_k"></div><p data-i18n="bb_p"></p></div>
+  </div>
+</section>
+
+<section id="guide">
+  <div class="wrap">
+    <div class="eyebrow rise" data-i18n="guide_eyebrow"></div>
+    <h2 class="rise" data-i18n="guide_h2"></h2>
+    <p class="lede rise" data-i18n="guide_lede"></p>
+    <div class="rows">
+      <div class="row rise"><span class="m">📩</span><div><h3 data-i18n="g1_h"></h3><p data-i18n="g1_p"></p></div></div>
+      <div class="row rise"><span class="m">🧩</span><div><h3 data-i18n="g2_h"></h3><p data-i18n="g2_p"></p></div></div>
+      <div class="row rise"><span class="m">🔑</span><div><h3 data-i18n="g3_h"></h3><p data-i18n="g3_p"></p></div></div>
+      <div class="row rise"><span class="m">✅</span><div><h3 data-i18n="g4_h"></h3><p data-i18n="g4_p"></p></div></div>
+    </div>
   </div>
 </section>
 
@@ -339,7 +369,13 @@ const I18N={
   join_eyebrow:"let's go",join_h2:"Three minutes — and your account is in play",
   step1:"1 · get your file",step2:"2 · install the extension",step3:"3 · log into MEXC",
   join_lede:"After that it works on its own. Ready? Message the operator who sent you this link.",
-  note:"We split the profit as agreed: counted from the log of every trade, transparently. Your account and your money are always yours."},
+  note:"We split the profit as agreed: counted from the log of every trade, transparently. Your account and your money are always yours.",
+  cb_lab:"Operator",guide_eyebrow:"connect · 3 minutes",guide_h2:"How to connect",
+  guide_lede:"You get one file and set it up once. Nothing to paste — it's all pre-configured inside.",
+  g1_h:"1 · Get your file",g1_p:"The operator sends you a single file, hands-XX.zip. Everything is already set up inside — you paste nothing. Unzip it into its own folder and don't move or delete that folder.",
+  g2_h:"2 · Install the extension",g2_p:"In a Chrome-based browser (Chrome, Brave, Edge) open chrome://extensions, turn on Developer mode in the top-right, click Load unpacked and pick that folder. The “Flip Hands” tile appears — done.",
+  g3_h:"3 · Log into MEXC",g3_p:"In the same browser open mexc.com and log in as usual. Keep the tab open — you can minimize it.",
+  g4_h:"Check it's live",g4_p:"Click the extension icon: Link — online (green), Idle mode — on (that's correct at the start). That's it. When the operator gives the go, trades run on their own."},
  ru:{name:"Русский",badge:"MEXC · пары без комиссии",h1a:"Твой аккаунт",h1b:"работает сам",
   hero_lede:"Подключаешь свой аккаунт за три минуты. Дальше он торгует без тебя — а ты в любой момент видишь, сколько заработал.",
   scroll:"листай",what_eyebrow:"в курс дела",what_h2:"Откуда берётся профит",
@@ -359,7 +395,13 @@ const I18N={
   join_eyebrow:"поехали",join_h2:"Три минуты — и аккаунт в деле",
   step1:"1 · получаешь свой файл",step2:"2 · ставишь расширение",step3:"3 · заходишь в MEXC",
   join_lede:"Дальше он работает сам. Готов — напиши оператору, который прислал тебе эту ссылку.",
-  note:"Профит делим по договорённости: считается по логу каждой сделки, прозрачно. Аккаунт и деньги всё время твои."},
+  note:"Профит делим по договорённости: считается по логу каждой сделки, прозрачно. Аккаунт и деньги всё время твои.",
+  cb_lab:"Оператор",guide_eyebrow:"подключение · 3 минуты",guide_h2:"Как подключиться",
+  guide_lede:"Тебе присылают один файл и настраиваешь один раз. Вставлять ничего не нужно — внутри уже всё готово.",
+  g1_h:"1 · Получи свой файл",g1_p:"Оператор присылает один файл hands-XX.zip. Внутри уже всё настроено — ты ничего не вставляешь. Распакуй его в отдельную папку и не переноси и не удаляй её.",
+  g2_h:"2 · Поставь расширение",g2_p:"В браузере на движке Chrome (Chrome, Brave, Edge) открой chrome://extensions, включи «Режим разработчика» справа сверху, нажми «Загрузить распакованное» и выбери ту папку. Появится плитка «Flip Hands» — готово.",
+  g3_h:"3 · Зайди в MEXC",g3_p:"В этом же браузере открой mexc.com и войди как обычно. Держи вкладку открытой — можно свернуть.",
+  g4_h:"Проверь связь",g4_p:"Нажми на иконку расширения: Связь — онлайн (зелёным), Холостой режим — включён (так и надо на старте). Всё. Когда оператор даст старт — сделки пойдут сами."},
  es:{name:"Español",badge:"MEXC · pares sin comisión",h1a:"Tu cuenta",h1b:"trabaja sola",
   hero_lede:"Conecta tu cuenta en tres minutos. Después opera sin ti — y en cualquier momento ves cuánto has ganado.",
   scroll:"desliza",what_eyebrow:"la idea",what_h2:"De dónde sale la ganancia",
@@ -916,7 +958,7 @@ function applyLang(code){
   const d=I18N[code]||I18N.en;
   document.documentElement.lang=code;
   document.documentElement.dir=RTL.includes(code)?'rtl':'ltr';
-  document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');if(d[k]!=null)el.textContent=d[k];});
+  document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');const v=(d[k]!=null)?d[k]:I18N.en[k];if(v!=null)el.textContent=v;});
   document.getElementById('langlabel').textContent=d.name;
   const lf=document.getElementById('langflag');lf.textContent='';lf.className='fi fi-'+(FLAG[code]||'gb');
   applyTheme(code);

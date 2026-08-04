@@ -311,6 +311,51 @@ h2{font-size:clamp(30px,5.5vw,48px);line-height:1.08;margin:0 0 20px;font-weight
 </section>
 
 <style>
+  /* ---- qualification check ---- */
+  #fit .checks{display:grid;gap:2px;margin-top:34px;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  #fit .chk{background:var(--card);padding:22px}
+  #fit .chk-top{display:flex;align-items:center;gap:14px;margin-bottom:9px}
+  #fit .chk .m{width:34px;height:34px;border-radius:10px;background:var(--cyan-dim);color:var(--cyan);
+    display:grid;place-items:center;font-size:16px;flex:none}
+  #fit .chk h3{margin:0;font-size:16.5px;font-weight:650}
+  #fit .chk p{margin:0 0 14px;color:var(--soft);font-size:14.5px;line-height:1.5}
+  #fit .peek{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+    font-family:ui-monospace,"SF Mono",Consolas,monospace;font-size:13px;
+    background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:11px 14px}
+  #fit .pk-l{color:var(--dim)}
+  #fit .pk-v{font-weight:600;white-space:nowrap}
+  #fit .pk-v.neg{color:var(--amber)}
+  #fit .pk-v.ok{color:var(--cyan)}
+  #fit .where{margin-top:10px;font-size:13px;color:var(--dim);line-height:1.5}
+  [dir="rtl"] #fit .chk p,[dir="rtl"] #fit .chk h3,[dir="rtl"] #fit .where{text-align:right}
+</style>
+
+<section id="fit">
+  <div class="wrap">
+    <div class="eyebrow rise" data-i18n="fit_eyebrow"></div>
+    <h2 class="rise" data-i18n="fit_h2"></h2>
+    <p class="lede rise" data-i18n="fit_lede"></p>
+
+    <div class="checks rise">
+      <div class="chk">
+        <div class="chk-top"><span class="m">📉</span><h3 data-i18n="fit_c1_h"></h3></div>
+        <p data-i18n="fit_c1_p"></p>
+        <div class="peek"><span class="pk-l" data-i18n="fit_c1_lab"></span><span class="pk-v neg">−142.60 USDT</span></div>
+        <div class="where" data-i18n="fit_c1_w"></div>
+      </div>
+      <div class="chk">
+        <div class="chk-top"><span class="m">🎟️</span><h3 data-i18n="fit_c2_h"></h3></div>
+        <p data-i18n="fit_c2_p"></p>
+        <div class="peek"><span class="pk-l" data-i18n="fit_c2_lab"></span><span class="pk-v ok">0.000% / 0.000%</span></div>
+        <div class="where" data-i18n="fit_c2_w"></div>
+      </div>
+    </div>
+
+    <div class="blackbox rise"><div class="k" data-i18n="fit_do_k"></div><p data-i18n="fit_do_p"></p></div>
+  </div>
+</section>
+
+<style>
   #finale{--green:#3fb950;--red:#f85149;--card2:#0b1119;--cyan-dim:rgba(60,224,208,.12);--green-dim:rgba(63,185,80,.12)}
   #finale .wrap{max-width:680px}
   #finale .lead{color:var(--soft);text-align:center;margin:6px auto 30px;max-width:48ch;font-size:16px}
@@ -482,6 +527,18 @@ const I18N={
   row5_h:"Stop anytime",row5_p:"Turn off the extension or log out of the exchange — everything freezes. You're not locked into anything.",
   bb_k:"so how does the engine find the moments?",
   bb_p:"That's our kitchen — years of tuning and live statistics. You don't need to know it: you just connect and take your share of what your account earns.",
+  fit_eyebrow:"check yourself",fit_h2:"Does my account qualify?",
+  fit_lede:"Two things have to be true. Checking takes a minute — and you don't have to judge it yourself, just send two screenshots.",
+  fit_c1_h:"The account is in the red",
+  fit_c1_p:"Your futures result has to be negative. That's what this works on — a losing account is the requirement here, not a problem.",
+  fit_c1_lab:"look for a line like",
+  fit_c1_w:"MEXC app → Futures → Positions → Position History. Or Assets → Futures, where the total is shown. Wording differs slightly between app versions.",
+  fit_c2_h:"Trading fees are zero",
+  fit_c2_p:"On the pairs we trade the fee has to be 0%. If it isn't, commission eats the whole edge and there's nothing left to win back.",
+  fit_c2_lab:"taker / maker should read",
+  fit_c2_w:"Open any futures pair — the fee is shown right on the order panel, next to the amount.",
+  fit_do_k:"what to send",
+  fit_do_p:"Two screenshots: your futures result and the fee line. Send them to me and within a few minutes I'll tell you whether the account fits. Don't rule yourself out — it's easy to misread, and the screenshot settles it.",
   join_eyebrow:"let's go",join_h2:"Three minutes — and your account is in play",
   step1:"1 · get your file",step2:"2 · install the extension",step3:"3 · log into MEXC",
   join_lede:"After that it works on its own. Ready? Message the operator who sent you this link.",
@@ -553,6 +610,18 @@ const I18N={
   row5_h:"Стоп в любой момент",row5_p:"Выключил расширение или вышел из биржи — и всё замерло. Ты ничем не связан.",
   bb_k:"а как именно движок находит моменты?",
   bb_p:"Это наша кухня — годы настройки и живой статистики. Тебе её знать не нужно: ты просто подключаешься и получаешь свою долю с того, что заработал твой аккаунт.",
+  fit_eyebrow:"проверка",fit_h2:"Подходит ли мой аккаунт?",
+  fit_lede:"Должны совпасть две вещи. Проверить — минута, и решать самому не нужно: просто пришли два скриншота.",
+  fit_c1_h:"Аккаунт в минусе",
+  fit_c1_p:"Результат по фьючерсам должен быть отрицательным. Именно на таких аккаунтах это и работает — минус здесь требование, а не проблема.",
+  fit_c1_lab:"ищи строку вроде",
+  fit_c1_w:"Приложение MEXC → Фьючерсы → Позиции → История позиций. Или Активы → Фьючерсы, там виден общий итог. Формулировки немного отличаются в разных версиях приложения.",
+  fit_c2_h:"Нулевая комиссия",
+  fit_c2_p:"На парах, которыми мы торгуем, комиссия должна быть 0%. Иначе она съедает весь запас, и отыгрывать становится нечего.",
+  fit_c2_lab:"тейкер / мейкер должны быть",
+  fit_c2_w:"Открой любую фьючерсную пару — комиссия видна прямо на панели ордера, рядом с суммой.",
+  fit_do_k:"что прислать",
+  fit_do_p:"Два скриншота: результат по фьючерсам и строку с комиссией. Пришли мне — за пару минут скажу, подходит аккаунт или нет. Сам себя не отсеивай: ошибиться легко, а по скриншоту всё видно точно.",
   join_eyebrow:"поехали",join_h2:"Три минуты — и аккаунт в деле",
   step1:"1 · получаешь свой файл",step2:"2 · ставишь расширение",step3:"3 · заходишь в MEXC",
   join_lede:"Дальше он работает сам. Готов — напиши оператору, который прислал тебе эту ссылку.",

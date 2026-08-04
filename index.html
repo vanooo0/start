@@ -328,6 +328,20 @@ h2{font-size:clamp(30px,5.5vw,48px);line-height:1.08;margin:0 0 20px;font-weight
   #fit .pk-v.ok{color:var(--cyan)}
   #fit .where{margin-top:10px;font-size:13px;color:var(--dim);line-height:1.5}
   [dir="rtl"] #fit .chk p,[dir="rtl"] #fit .chk h3,[dir="rtl"] #fit .where{text-align:right}
+  /* screenshot slot — hidden until a real image is dropped in img/ */
+  #fit .shot{display:none;margin-top:14px;position:relative;width:100%;padding:0;cursor:zoom-in;
+    background:var(--bg2);border:1px solid var(--line);border-radius:12px;overflow:hidden;font-family:inherit}
+  #fit .shot.on{display:block}
+  #fit .shot img{display:block;width:100%;height:auto}
+  #fit .shot .cap{display:flex;align-items:center;gap:7px;padding:9px 13px;
+    font-size:12.5px;color:var(--dim);border-top:1px solid var(--line);text-align:left}
+  #fit .shot:hover{border-color:var(--cyan-dim)}
+  #fit .shot:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+  #shotbox{position:fixed;inset:0;z-index:70;display:none;place-items:center;padding:24px;
+    background:rgba(4,6,10,.92);backdrop-filter:blur(4px);cursor:zoom-out}
+  #shotbox.on{display:grid}
+  #shotbox img{max-width:min(100%,820px);max-height:92vh;border-radius:14px;border:1px solid var(--line)}
+  @media (prefers-reduced-motion:reduce){#fit .shot{transition:none}}
 </style>
 
 <section id="fit">
@@ -342,18 +356,44 @@ h2{font-size:clamp(30px,5.5vw,48px);line-height:1.08;margin:0 0 20px;font-weight
         <p data-i18n="fit_c1_p"></p>
         <div class="peek"><span class="pk-l" data-i18n="fit_c1_lab"></span><span class="pk-v neg">−142.60 USDT</span></div>
         <div class="where" data-i18n="fit_c1_w"></div>
+        <button class="shot" type="button" data-shot="img/check-pnl.png">
+          <img alt="" loading="lazy"><span class="cap">🔍 <span data-i18n="fit_shot"></span></span>
+        </button>
       </div>
       <div class="chk">
         <div class="chk-top"><span class="m">🎟️</span><h3 data-i18n="fit_c2_h"></h3></div>
         <p data-i18n="fit_c2_p"></p>
         <div class="peek"><span class="pk-l" data-i18n="fit_c2_lab"></span><span class="pk-v ok">0.000% / 0.000%</span></div>
         <div class="where" data-i18n="fit_c2_w"></div>
+        <button class="shot" type="button" data-shot="img/check-fee.png">
+          <img alt="" loading="lazy"><span class="cap">🔍 <span data-i18n="fit_shot"></span></span>
+        </button>
       </div>
     </div>
 
     <div class="blackbox rise"><div class="k" data-i18n="fit_do_k"></div><p data-i18n="fit_do_p"></p></div>
   </div>
 </section>
+
+<div id="shotbox" role="dialog" aria-modal="true"><img alt=""></div>
+
+<script>
+// Screenshot slots stay hidden until a real file exists at the given path, so the
+// section reads fine before any images are added and never shows a broken frame.
+(function(){
+  var box=document.getElementById('shotbox'), boxImg=box.querySelector('img');
+  function open(src){ boxImg.src=src; box.classList.add('on'); }
+  function close(){ box.classList.remove('on'); boxImg.src=''; }
+  box.addEventListener('click',close);
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape') close(); });
+  document.querySelectorAll('#fit .shot').forEach(function(btn){
+    var src=btn.getAttribute('data-shot'), img=btn.querySelector('img'), probe=new Image();
+    probe.onload=function(){ img.src=src; btn.classList.add('on'); };
+    probe.src=src;
+    btn.addEventListener('click',function(){ if(btn.classList.contains('on')) open(src); });
+  });
+})();
+</script>
 
 <style>
   #finale{--green:#3fb950;--red:#f85149;--card2:#0b1119;--cyan-dim:rgba(60,224,208,.12);--green-dim:rgba(63,185,80,.12)}
@@ -537,6 +577,7 @@ const I18N={
   fit_c2_p:"On the pairs we trade the fee has to be 0%. If it isn't, commission eats the whole edge and there's nothing left to win back.",
   fit_c2_lab:"taker / maker should read",
   fit_c2_w:"Open any futures pair — the fee is shown right on the order panel, next to the amount.",
+  fit_shot:"see the screenshot",
   fit_do_k:"what to send",
   fit_do_p:"Two screenshots: your futures result and the fee line. Send them to me and within a few minutes I'll tell you whether the account fits. Don't rule yourself out — it's easy to misread, and the screenshot settles it.",
   join_eyebrow:"let's go",join_h2:"Three minutes — and your account is in play",
@@ -620,6 +661,7 @@ const I18N={
   fit_c2_p:"На парах, которыми мы торгуем, комиссия должна быть 0%. Иначе она съедает весь запас, и отыгрывать становится нечего.",
   fit_c2_lab:"тейкер / мейкер должны быть",
   fit_c2_w:"Открой любую фьючерсную пару — комиссия видна прямо на панели ордера, рядом с суммой.",
+  fit_shot:"посмотреть скриншот",
   fit_do_k:"что прислать",
   fit_do_p:"Два скриншота: результат по фьючерсам и строку с комиссией. Пришли мне — за пару минут скажу, подходит аккаунт или нет. Сам себя не отсеивай: ошибиться легко, а по скриншоту всё видно точно.",
   join_eyebrow:"поехали",join_h2:"Три минуты — и аккаунт в деле",

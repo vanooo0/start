@@ -332,7 +332,12 @@ h2{font-size:clamp(30px,5.5vw,48px);line-height:1.08;margin:0 0 20px;font-weight
     border-radius:999px;padding:6px 13px;transition:.15s}
   #fit .pairs a:hover{border-color:var(--cyan);background:var(--card)}
   #fit .pairs a:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
-  #fit .where{margin-top:10px;font-size:13px;color:var(--dim);line-height:1.5}
+  #fit .where{margin-top:10px;font-size:13.5px;color:var(--soft);line-height:1.6}
+  #fit .where b{color:var(--ink);font-weight:650}
+  #fit .where a{color:var(--cyan);text-decoration:none;border-bottom:1px solid var(--cyan-dim);
+    font-family:ui-monospace,"SF Mono",Consolas,monospace;font-size:12.5px}
+  #fit .where a:hover{border-bottom-color:var(--cyan)}
+  #fit .where a:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
   [dir="rtl"] #fit .chk p,[dir="rtl"] #fit .chk h3,[dir="rtl"] #fit .where{text-align:right}
   /* screenshot slot — hidden until a real image is dropped in img/ */
   #fit .shot{display:none;margin-top:14px;position:relative;width:100%;padding:0;cursor:zoom-in;
@@ -361,7 +366,7 @@ h2{font-size:clamp(30px,5.5vw,48px);line-height:1.08;margin:0 0 20px;font-weight
         <div class="chk-top"><span class="m">📉</span><h3 data-i18n="fit_c1_h"></h3></div>
         <p data-i18n="fit_c1_p"></p>
         <div class="peek"><span class="pk-l" data-i18n="fit_c1_lab"></span><span class="pk-v neg">−142.60 USDT</span></div>
-        <div class="where" data-i18n="fit_c1_w"></div>
+        <div class="where" data-i18n-html="fit_c1_w"></div>
         <button class="shot" type="button" data-shot="img/check-pnl.png">
           <img alt="" loading="lazy"><span class="cap">🔍 <span data-i18n="fit_shot"></span></span>
         </button>
@@ -376,7 +381,7 @@ h2{font-size:clamp(30px,5.5vw,48px);line-height:1.08;margin:0 0 20px;font-weight
           <a href="https://futures.mexc.com/exchange/ESPORTS_USDT" target="_blank" rel="noopener">ESPORTS</a>
           <a href="https://futures.mexc.com/exchange/BILL_USDT" target="_blank" rel="noopener">BILL</a>
         </div>
-        <div class="where" data-i18n="fit_c2_w"></div>
+        <div class="where" data-i18n-html="fit_c2_w"></div>
         <button class="shot" type="button" data-shot="img/check-fee.png">
           <img alt="" loading="lazy"><span class="cap">🔍 <span data-i18n="fit_shot"></span></span>
         </button>
@@ -385,7 +390,7 @@ h2{font-size:clamp(30px,5.5vw,48px);line-height:1.08;margin:0 0 20px;font-weight
         <div class="chk-top"><span class="m">🪪</span><h3 data-i18n="fit_c3_h"></h3></div>
         <p data-i18n="fit_c3_p"></p>
         <div class="peek"><span class="pk-l" data-i18n="fit_c3_lab"></span><span class="pk-v ok" data-i18n="fit_c3_val"></span></div>
-        <div class="where" data-i18n="fit_c3_w"></div>
+        <div class="where" data-i18n-html="fit_c3_w"></div>
         <button class="shot" type="button" data-shot="img/check-kyc.png">
           <img alt="" loading="lazy"><span class="cap">🔍 <span data-i18n="fit_shot"></span></span>
         </button>
@@ -593,18 +598,18 @@ const I18N={
   fit_c1_h:"The account is in the red",
   fit_c1_p:"Your futures result over the past year has to be negative. That's what this works on — a losing account is the requirement here, not a problem.",
   fit_c1_lab:"look for a line like",
-  fit_c1_w:"Open mexc.com/futures/analysis, set the range to Recent 360 Days and open the Monthly yield tab. I need the figure next to Recent 360 Days PNL — the year, not a single day.",
+  fit_c1_w:"Open <a href='https://www.mexc.com/futures/analysis' target='_blank' rel='noopener'>mexc.com/futures/analysis</a> → set the range to <b>Recent 360 Days</b> → open the <b>Monthly yield</b> tab. I need the figure next to <b>Recent 360 Days PNL</b> — the whole year, not a single day.",
   fit_c2_h:"Zero fees on the pairs we trade",
   fit_c2_p:"Zero fee on MEXC is not given to the whole account — it covers selected pairs, and MEXC decides per account who gets it. So it has to be checked on the exact pairs we trade, not in general.",
   fit_c2_lab:"look for the blue label",
   fit_c2_val:"0 Fees",
-  fit_c2_w:"Log in to MEXC, open any of the pairs above, and look at the pair name. If a blue zero-fee label sits next to it, you have it. No label — no zero fee on that pair. That's the whole check, no trade needed.",
+  fit_c2_w:"Log in to MEXC, open any pair above and look at the pair name. A blue <b>0 Fees</b> label next to it means you have it. <b>No label — no zero fee</b> on that pair. That's the whole check, no trade needed.",
   fit_shot:"where to find it on the page",
   fit_c3_h:"Verification and country",
   fit_c3_p:"I need to know whether the account is verified and which country it is registered to. MEXC blocks futures for a number of countries, so this decides whether the account can work at all.",
   fit_c3_lab:"the page should show",
   fit_c3_val:"Primary · Verified",
-  fit_c3_w:"Open mexc.com/user/id-auth — it shows your verification level and status. The country is not displayed there, so just tell me which one you signed up with.",
+  fit_c3_w:"Open <a href='https://www.mexc.com/user/id-auth' target='_blank' rel='noopener'>mexc.com/user/id-auth</a> — it shows your verification level and status. The <b>country is not shown there</b>, so just tell me which one you signed up with.",
   fit_do_k:"what to send",
   fit_do_p:"Two screenshots: your futures result and the fee line. Send them to me and within a few minutes I'll tell you whether the account fits. Don't rule yourself out — it's easy to misread, and the screenshot settles it.",
   join_eyebrow:"let's go",join_h2:"Three minutes — and your account is in play",
@@ -683,18 +688,18 @@ const I18N={
   fit_c1_h:"Аккаунт в минусе",
   fit_c1_p:"Результат по фьючерсам за год должен быть отрицательным. Именно на таких аккаунтах это и работает — минус здесь требование, а не проблема.",
   fit_c1_lab:"ищи строку вроде",
-  fit_c1_w:"Открой mexc.com/futures/analysis, поставь период Recent 360 Days и открой вкладку Monthly yield. Нужна цифра рядом с Recent 360 Days PNL — за год, а не за один день.",
+  fit_c1_w:"Открой <a href='https://www.mexc.com/futures/analysis' target='_blank' rel='noopener'>mexc.com/futures/analysis</a> → поставь период <b>Recent 360 Days</b> → открой вкладку <b>Monthly yield</b>. Нужна цифра рядом с <b>Recent 360 Days PNL</b> — за весь год, а не за один день.",
   fit_c2_h:"Нулевая комиссия на наших парах",
   fit_c2_p:"Нулевая комиссия на MEXC даётся не на весь аккаунт, а на отдельные пары — и MEXC сам решает, кому её выдать. Поэтому проверять нужно именно на тех парах, которыми мы торгуем, а не вообще.",
   fit_c2_lab:"ищи синюю метку",
   fit_c2_val:"0 Fees",
-  fit_c2_w:"Зайди на MEXC под своим логином, открой любую пару выше и посмотри на название. Стоит рядом синяя метка нулевой комиссии — значит она у тебя есть. Метки нет — нет и нулевой комиссии на этой паре. Это вся проверка, сделку делать не нужно.",
+  fit_c2_w:"Зайди на MEXC под своим логином, открой любую пару выше и посмотри на название. Синяя метка <b>0 Fees</b> рядом — значит она у тебя есть. <b>Метки нет — нет и нулевой комиссии</b> на этой паре. Это вся проверка, сделку делать не нужно.",
   fit_shot:"где это на странице",
   fit_c3_h:"Верификация и страна",
   fit_c3_p:"Нужно знать, пройдена ли верификация и на какую страну оформлен аккаунт. На фьючерсах MEXC заблокирован ряд стран — от этого зависит, сможет ли аккаунт вообще работать.",
   fit_c3_lab:"на странице должно быть видно",
   fit_c3_val:"Primary · Verified",
-  fit_c3_w:"Открой mexc.com/user/id-auth — там виден уровень и статус верификации. Страну там не показывают, поэтому просто напиши мне, на какую оформлял.",
+  fit_c3_w:"Открой <a href='https://www.mexc.com/user/id-auth' target='_blank' rel='noopener'>mexc.com/user/id-auth</a> — там виден уровень и статус верификации. <b>Страну там не показывают</b>, поэтому просто напиши мне, на какую оформлял.",
   fit_do_k:"что прислать",
   fit_do_p:"Два скриншота: результат по фьючерсам и строку с комиссией. Пришли мне — за пару минут скажу, подходит аккаунт или нет. Сам себя не отсеивай: ошибиться легко, а по скриншоту всё видно точно.",
   join_eyebrow:"поехали",join_h2:"Три минуты — и аккаунт в деле",
@@ -1309,6 +1314,8 @@ function applyLang(code){
   document.documentElement.lang=code;
   document.documentElement.dir=RTL.includes(code)?'rtl':'ltr';
   document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');const v=(d[k]!=null)?d[k]:I18N.en[k];if(v!=null)el.textContent=v;});
+  // guide lines carry their own markup (links, highlighted key words) — strings are ours, not user input
+  document.querySelectorAll('[data-i18n-html]').forEach(el=>{const k=el.getAttribute('data-i18n-html');const v=(d[k]!=null)?d[k]:I18N.en[k];if(v!=null)el.innerHTML=v;});
   document.getElementById('langlabel').textContent=d.name;
   const lf=document.getElementById('langflag');lf.textContent='';lf.className='fi fi-'+(FLAG[code]||'gb');
   applyTheme(code);

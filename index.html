@@ -326,6 +326,12 @@ h2{font-size:clamp(30px,5.5vw,48px);line-height:1.08;margin:0 0 20px;font-weight
   #fit .pk-v{font-weight:600;white-space:nowrap}
   #fit .pk-v.neg{color:var(--amber)}
   #fit .pk-v.ok{color:var(--cyan)}
+  #fit .pairs{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  #fit .pairs a{font-family:ui-monospace,"SF Mono",Consolas,monospace;font-size:12.5px;letter-spacing:.4px;
+    color:var(--cyan);text-decoration:none;background:var(--bg2);border:1px solid var(--cyan-dim);
+    border-radius:999px;padding:6px 13px;transition:.15s}
+  #fit .pairs a:hover{border-color:var(--cyan);background:var(--card)}
+  #fit .pairs a:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
   #fit .where{margin-top:10px;font-size:13px;color:var(--dim);line-height:1.5}
   [dir="rtl"] #fit .chk p,[dir="rtl"] #fit .chk h3,[dir="rtl"] #fit .where{text-align:right}
   /* screenshot slot — hidden until a real image is dropped in img/ */
@@ -364,6 +370,12 @@ h2{font-size:clamp(30px,5.5vw,48px);line-height:1.08;margin:0 0 20px;font-weight
         <div class="chk-top"><span class="m">🎟️</span><h3 data-i18n="fit_c2_h"></h3></div>
         <p data-i18n="fit_c2_p"></p>
         <div class="peek"><span class="pk-l" data-i18n="fit_c2_lab"></span><span class="pk-v ok" data-i18n="fit_c2_val"></span></div>
+        <div class="pairs">
+          <a href="https://futures.mexc.com/exchange/BANK_USDT" target="_blank" rel="noopener">BANK</a>
+          <a href="https://futures.mexc.com/exchange/SKYAI_USDT" target="_blank" rel="noopener">SKYAI</a>
+          <a href="https://futures.mexc.com/exchange/ESPORTS_USDT" target="_blank" rel="noopener">ESPORTS</a>
+          <a href="https://futures.mexc.com/exchange/BILL_USDT" target="_blank" rel="noopener">BILL</a>
+        </div>
         <div class="where" data-i18n="fit_c2_w"></div>
         <button class="shot" type="button" data-shot="img/check-fee.png">
           <img alt="" loading="lazy"><span class="cap">🔍 <span data-i18n="fit_shot"></span></span>
@@ -584,9 +596,9 @@ const I18N={
   fit_c1_w:"Open mexc.com/futures/analysis, set the range to Recent 360 Days and open the Monthly yield tab. I need the figure next to Recent 360 Days PNL — the year, not a single day.",
   fit_c2_h:"Zero fees on the pairs we trade",
   fit_c2_p:"Zero fee on MEXC is not given to the whole account — it covers selected pairs, and MEXC decides per account who gets it. So it has to be checked on the exact pairs we trade, not in general.",
-  fit_c2_lab:"the pair should be labelled",
+  fit_c2_lab:"look for the blue label",
   fit_c2_val:"0 Fees",
-  fit_c2_w:"Open a futures pair on mexc.com while logged in — pairs that are zero-fee for you carry a 0 Fees label. Your own rates are also listed at mexc.com/fee, Futures tab.",
+  fit_c2_w:"Log in to MEXC, open any of the pairs above, and look at the pair name. If a blue zero-fee label sits next to it, you have it. No label — no zero fee on that pair. That's the whole check, no trade needed.",
   fit_shot:"where to find it on the page",
   fit_c3_h:"Verification and country",
   fit_c3_p:"I need to know whether the account is verified and which country it is registered to. MEXC blocks futures for a number of countries, so this decides whether the account can work at all.",
@@ -674,9 +686,9 @@ const I18N={
   fit_c1_w:"Открой mexc.com/futures/analysis, поставь период Recent 360 Days и открой вкладку Monthly yield. Нужна цифра рядом с Recent 360 Days PNL — за год, а не за один день.",
   fit_c2_h:"Нулевая комиссия на наших парах",
   fit_c2_p:"Нулевая комиссия на MEXC даётся не на весь аккаунт, а на отдельные пары — и MEXC сам решает, кому её выдать. Поэтому проверять нужно именно на тех парах, которыми мы торгуем, а не вообще.",
-  fit_c2_lab:"у пары должна стоять метка",
+  fit_c2_lab:"ищи синюю метку",
   fit_c2_val:"0 Fees",
-  fit_c2_w:"Открой фьючерсную пару на mexc.com под своим логином — у пар с нулевой комиссией стоит метка 0 Fees. Свои ставки видно и на mexc.com/fee, вкладка Futures.",
+  fit_c2_w:"Зайди на MEXC под своим логином, открой любую пару выше и посмотри на название. Стоит рядом синяя метка нулевой комиссии — значит она у тебя есть. Метки нет — нет и нулевой комиссии на этой паре. Это вся проверка, сделку делать не нужно.",
   fit_shot:"где это на странице",
   fit_c3_h:"Верификация и страна",
   fit_c3_p:"Нужно знать, пройдена ли верификация и на какую страну оформлен аккаунт. На фьючерсах MEXC заблокирован ряд стран — от этого зависит, сможет ли аккаунт вообще работать.",
